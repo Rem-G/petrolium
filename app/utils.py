@@ -91,9 +91,7 @@ class Petrol:
 				and coor[1] <= y2):
 
 				geo_json['features'].append(feature)
-
-		print(len(geo_json['features']))
-
+				
 		return geo_json
 
 

@@ -8,31 +8,56 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<style>
-		.map {
-			width: 100%;
-			height: 100%;
-			position: fixed;
-		}
-
- 
-	</style>
-
 	<link rel="stylesheet" href="{% static '/openlayers/ol.css' %}" />
 	<link rel="stylesheet" href="{% static '/bootstrap/css/bootstrap.css' %}" />
 	<link rel="stylesheet" href="{% static '/geocoder/ol-geocoder.min.css' %}">
+	<link rel="stylesheet" href="{% static '/style.css' %}" />
+	<link href="{% static '/fontawesome/css/all.css' %}" rel="stylesheet"> <!--load all styles -->
+	<link rel="stylesheet" type="text/css" href="{% static 'semantic/dist/semantic.min.css' %}">
 
     <script src="{% static '/jquery-3.5.1.js' %}"></script>
 	<script src="{% static '/openlayers/ol.js' %}"></script>
 	<script src="{% static '/bootstrap/js/bootstrap.js' %}"></script>
 	<script src="{% static '/geocoder/ol-geocoder.js' %}"></script>
+	<script src="{% static 'semantic/dist/semantic.min.js' %}"></script>
 
 </head>
 
 <body>
-	<div id="map" class="map"></div>
-		 
+	<div class="sidebar-head">
+		<i class="fas fa-angle-up sidebar-head-angle"></i>
+	</div>
+	
+	<div class="ui bottom
+	 demo vertical inverted sidebar labeled icon menu">
+		<a class="item">
+		  <i class="home icon"></i>
+		  Home
+		</a>
+		<a class="item">
+		  <i class="block layout icon"></i>
+		  Topics
+		</a>
+		<a class="item">
+		  <i class="smile icon"></i>
+		  Friends
+		</a>
+	  </div>
+
+	  <div id="main pusher">
+		<div id="map" class="map"></div>
+
+		<div id="popup" class="ol-popup">
+			<a href="#" id="popup-closer" class="ol-popup-closer"></a>
+			<div id="popup-content"></div>
+		</div>
+	</div>
+
 	<script type="text/javascript">
+		$('.sidebar-head').click(function(){
+			$('.ui.labeled.icon.sidebar').sidebar('toggle');
+		})
+
 
 		//**********DATA GETTER -> BBOX STRATEGY**********
 		var vectorSource = new ol.source.Vector({
@@ -65,12 +90,13 @@
 		////***************************
 
 		var petrol_station_svg = '<svg width="40px" height="40px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gas-pump" class="svg-inline--fa fa-gas-pump fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z"></path></svg>';
+		var selected_petrol_station_svg = '<svg width="40px" color="blue" height="40px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gas-pump" class="svg-inline--fa fa-gas-pump fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z"></path></svg>';
+
 
 		var iconStyle = new ol.style.Style({
 			image: new ol.style.Icon({
 					opacity: 0.6,
 					src: 'data:image/svg+xml;utf8,' + petrol_station_svg,
-					scale: 0.3,
 				}),
 			});
 
@@ -144,6 +170,70 @@
 				center: [259817.27, 5439812.49],
 				zoom: 11,
 			})
+		});
+
+		var container = document.getElementById('popup');
+    	var content_element = document.getElementById('popup-content');
+    	var closer = document.getElementById('popup-closer');
+
+		closer.onclick = function() {
+			overlay.setPosition(undefined);
+			closer.blur();
+			return false;
+		};
+
+		var overlay = new ol.Overlay({
+			element: container,
+			autoPan: true,
+			offset: [0, -10]
+		});
+		map.addOverlay(overlay);
+
+		var highlightStyle = new ol.style.Style({
+			image: new ol.style.Icon({
+					opacity: 0.7,
+					src: 'data:image/svg+xml;utf8,' + selected_petrol_station_svg,
+				}),
+		});
+
+		var fullscreen = new ol.control.FullScreen();
+		map.addControl(fullscreen);
+
+		map.on('click', function(evt){
+			var feature = map.forEachFeatureAtPixel(evt.pixel,
+				function(feature, layer) {
+					return feature;
+				});
+			if (feature.get('id')) {
+				var geometry = feature.getGeometry();
+				var coord = geometry.getCoordinates();
+
+				feature.setStyle(highlightStyle);
+				var content = '<h3>' + feature.get('id') + '</h3>';
+				content += '<h5>' + feature.get('ville') + '</h5>';
+				
+				content_element.innerHTML = content;
+				overlay.setPosition(coord);
+				
+				console.info(feature.getProperties());
+			}
+		});
+
+		var selected = null;
+
+		map.on('pointermove', function (e) {
+			if (selected !== null) {
+				selected.setStyle(undefined);
+				selected = null;
+			}
+
+			map.forEachFeatureAtPixel(e.pixel, function (f) {
+				if (f.get('id')) {
+					selected = f;
+					f.setStyle(highlightStyle);
+					return true;
+				}
+			});
 		});
 
 
