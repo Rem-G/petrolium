@@ -7,8 +7,6 @@ import json
 import time
 from pyproj import Proj, transform
 
-
-from django.contrib.gis.geos import Point, GeometryCollection
 from django.conf import settings
 
 
@@ -112,7 +110,7 @@ class Petrol:
 		if isinstance(value['properties']['prix'], list):
 			#print('\n', value['properties']['prix'], '\n\n', value['properties'])
 			for prix in value['properties']['prix']:
-				if prix.get('@nom') == self.petrol_type:
+				if prix is not None and prix.get('@nom') == self.petrol_type:
 					return float(prix['@valeur'])
 		else:
 			if value['properties']['prix'].get('@nom') == self.petrol_type:
@@ -128,10 +126,10 @@ class Petrol:
 		for station in self.get_petrol_data(bbox)['features']:
 			if isinstance(station['properties']['prix'], list):
 				for prix in station['properties']['prix']:
-					if prix.get('@nom') == self.petrol_type:
+					if prix is not None and prix.get('@nom') == self.petrol_type:
 						stations_with_petrol.append(station)
 			else:#dict
-				if prix.get('@nom') == self.petrol_type:
+				if prix is not None and prix.get('@nom') == self.petrol_type:
 					station['properties']['prix'] = [station['properties']['prix']]
 					stations_with_petrol.append(station)
 
