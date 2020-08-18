@@ -27,7 +27,7 @@
 		<i class="fas fa-angle-up sidebar-head-angle"></i>
 	</div>
 	
-	<div class="ui bottom vertical inverted sidebar  labeled icon menu">
+	<div class="ui bottom vertical inverted sidebar labeled icon menu">
 		<a class="item" style="height: 5em;">
 			<form method="post" onsubmit="update_stations()">
 				{% csrf_token %}
@@ -37,9 +37,9 @@
 				<button type="button" id="SP98" class="btn btn-secondary station-btn">SP98</button>
 				<button type="button" id="GPLc" class="btn btn-secondary station-btn">GPL</button>
 				<button type="button" id="E85" class="btn btn-secondary station-btn">E85</button>
-				</form>
+			</form>
 		</a>
-		<a class="item" style="height: 30em;">
+		<a class="item not-active" style="height: 30em;">
 			<div class="loader" id="loader"></div>
 
 			<table id="stations_table" class="table">
@@ -66,6 +66,7 @@
 		//**********SIDE NAV***************
 		$('.sidebar-head').click(function(){
 			$('.ui.labeled.icon.sidebar').sidebar('toggle');
+			$('.table_body').html('');
 		})
 
 		$(".station-btn").click(function(e){

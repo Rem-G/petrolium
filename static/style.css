@@ -96,3 +96,10 @@ html, body, #map{
   .stations_table {
       overflow: auto;
   }
+
+  .not-active {
+    pointer-events: none;
+    cursor: default;
+    text-decoration: none;
+    color: black;
+  }

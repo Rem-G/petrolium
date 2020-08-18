@@ -9,7 +9,6 @@
 	</tr>
 
 {% else %}
-
 	{% for station in stations %}
 	<tr>
 		<td style='color: white; border:none'>
@@ -27,7 +26,13 @@
 									{% else %}
 										<h3>{{ station.properties.name }}</h3>
 									{% endif %}
+
 								</td>
+								{% if station.properties.pop == "A" %}
+								<td>
+									<img style="width:25px; height:25px;" src="{{ baseUrl }}/img/autoroute32.png"></img>
+								</td>
+							{% endif %}
 							</tr>
 							<tr>
 								<td>
