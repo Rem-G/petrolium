@@ -28,21 +28,22 @@
 		<i class="fas fa-angle-up sidebar-head-angle"></i>
 	</div>
 	
-	<div class="ui bottom
-	 demo vertical inverted sidebar labeled icon menu">
-		<a class="item">
-		  <i class="home icon"></i>
-		  Home
+	<div class="ui bottom vertical inverted sidebar  labeled icon menu">
+		<a class="item" style="height: 5em;">
+			<form method="post" onsubmit="update_stations()">
+				{% csrf_token %}
+				<button type="button" id="Gazole" class="btn btn-secondary station-btn">Gazole</button>
+				<button type="button" id="SP95" class="btn btn-secondary station-btn">SP95</button>
+				<button type="button" id="SP95-E10" class="btn btn-secondary station-btn">SP95-E10</button>
+				<button type="button" id="SP98" class="btn btn-secondary station-btn">SP98</button>
+				<button type="button" id="GPL" class="btn btn-secondary station-btn">GPL</button>
+				<button type="button" id="E85" class="btn btn-secondary station-btn">E85</button>
+				</form>
 		</a>
-		<a class="item">
-		  <i class="block layout icon"></i>
-		  Topics
+		<a class="item" style="height: 30em;">
+			<span class="status"></span>
 		</a>
-		<a class="item">
-		  <i class="smile icon"></i>
-		  Friends
-		</a>
-	  </div>
+	</div>
 
 	  <div id="main pusher">
 		<div id="map" class="map"></div>
@@ -54,9 +55,33 @@
 	</div>
 
 	<script type="text/javascript">
+		//**********SIDE NAV***************
 		$('.sidebar-head').click(function(){
 			$('.ui.labeled.icon.sidebar').sidebar('toggle');
 		})
+
+		$(".station-btn").click(function(e){
+			update_stations(e.target.id);
+		});
+
+		function update_stations(petrol_type) {
+			var bbox = ''
+			map.getView().calculateExtent(map.getSize()).forEach(coor => {
+				bbox += coor + ','
+			});
+
+			$.ajax({
+			method: "GET",
+			url: "/station/",
+			data: {'bbox': bbox, 'petrol_type': petrol_type},
+			success: function(data) {
+				console.log(data) // check out how data is structured
+				$('.status').contents()[0].textContent = 'Balance&nbsp'+data.stations
+			}
+			})
+		};
+
+		//**********************************
 
 
 		//**********DATA GETTER -> BBOX STRATEGY**********
@@ -90,7 +115,7 @@
 		////***************************
 
 		var petrol_station_svg = '<svg width="40px" height="40px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gas-pump" class="svg-inline--fa fa-gas-pump fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z"></path></svg>';
-		var selected_petrol_station_svg = '<svg width="40px" color="blue" height="40px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gas-pump" class="svg-inline--fa fa-gas-pump fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z"></path></svg>';
+		var selected_petrol_station_svg = '<svg width="40px" height="40px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gas-pump" class="svg-inline--fa fa-gas-pump fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z"></path></svg>';
 
 
 		var iconStyle = new ol.style.Style({
@@ -151,8 +176,6 @@
 
 		//Mapbox access_token
 		var accessToken = 'pk.eyJ1IjoicGV0cm9saXVtIiwiYSI6ImNrZHliaHphcDFjcWcycnBpMTlpYmgycDMifQ.8Yn17qBucMsu4HelUb5VHg';
-
-		var styleJson = 'https://api.maptiler.com/maps/voyager/style.json?key=d0G5XtSBnPmk6SzUMOiN';
 
 		var map = new ol.Map({
 			target: 'map',

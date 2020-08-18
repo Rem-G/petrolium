@@ -18,6 +18,7 @@ class Petrol:
 		self.static_path = settings.MEDIA_ROOT + '/data/'
 		self.create_petrol_data()
 		self.geojson_data = self.xml_to_json(self.static_path, 'PrixCarburants_instantane')
+		self.petrol_type = None
 
 	def download_petrol_data(self, requests_url, static_url, filename, chunk_size=128):
 		r = requests.get(requests_url, stream=True)
@@ -91,8 +92,46 @@ class Petrol:
 				and coor[1] <= y2):
 
 				geo_json['features'].append(feature)
-				
+
 		return geo_json
+
+	def findPetrol(self, value):
+		if isinstance(value['properties']['prix'], list):
+			for prix in value['properties']['prix']:
+				# print(value['properties']['prix'], 'LEN', len(value['properties']['prix']), type(value['properties']['prix']))
+				# print(prix.get('@nom'))
+				if prix.get('@nom') == self.petrol_type:
+					print(float(prix['@valeur']))
+					return float(prix['@valeur'])
+		else:
+			if value['properties']['prix'].get('@nom') == self.petrol_type:
+				print(float(value['properties']['prix']['@valeur']))
+				return float(value['properties']['prix']['@valeur'])
+
+
+	def sortStations(self, bbox, petrol_type):
+		self.petrol_type = petrol_type
+		stations_in_bbox = self.get_petrol_data(bbox)['features']
+
+		stations_with_petrol = []
+
+		for station in stations_in_bbox:
+			if isinstance(station['properties']['prix'], list):
+				for prix in station['properties']['prix']:
+					if prix.get('@nom') == petrol_type:
+						stations_with_petrol.append(station)
+			else:#dict
+				if prix.get('@nom') == petrol_type:
+					stations_with_petrol.append(station)
+
+		sortedStations = sorted(stations_with_petrol, key=self.findPetrol)
+
+		return {'features': sortedStations}
+
+
+
+
+
 
 
 

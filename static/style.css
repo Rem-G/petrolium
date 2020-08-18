@@ -63,6 +63,10 @@ html, body, #map{
     position: fixed;
 }
 
+.sidebar-head:hover {
+    background-color: rgb(45, 46, 47);
+}
+
 .sidebar-head-angle {
     left: 50%;
     color: white;
