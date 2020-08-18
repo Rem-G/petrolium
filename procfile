@@ -1,2 +1,1 @@
 web: gunicorn petrolium.wsgi
-heroku config:set DISABLE_COLLECTSTATIC=1
