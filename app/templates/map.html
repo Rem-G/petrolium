@@ -12,15 +12,14 @@
 	<link rel="stylesheet" href="{% static '/bootstrap/css/bootstrap.css' %}" />
 	<link rel="stylesheet" href="{% static '/geocoder/ol-geocoder.min.css' %}">
 	<link rel="stylesheet" href="{% static '/style.css' %}" />
-	<link href="{% static '/fontawesome/css/all.css' %}" rel="stylesheet"> <!--load all styles -->
-	<link rel="stylesheet" type="text/css" href="{% static 'semantic/dist/semantic.min.css' %}">
+	<link rel="stylesheet" href="{% static '/fontawesome/css/all.css' %}">
+	<link rel="stylesheet" href="{% static 'semantic/dist/semantic.min.css' %}">
 
     <script src="{% static '/jquery-3.5.1.js' %}"></script>
 	<script src="{% static '/openlayers/ol.js' %}"></script>
 	<script src="{% static '/bootstrap/js/bootstrap.js' %}"></script>
 	<script src="{% static '/geocoder/ol-geocoder.js' %}"></script>
 	<script src="{% static 'semantic/dist/semantic.min.js' %}"></script>
-
 </head>
 
 <body>
@@ -34,14 +33,21 @@
 				{% csrf_token %}
 				<button type="button" id="Gazole" class="btn btn-secondary station-btn">Gazole</button>
 				<button type="button" id="SP95" class="btn btn-secondary station-btn">SP95</button>
-				<button type="button" id="SP95-E10" class="btn btn-secondary station-btn">SP95-E10</button>
+				<button type="button" id="E10" class="btn btn-secondary station-btn">SP95-E10</button>
 				<button type="button" id="SP98" class="btn btn-secondary station-btn">SP98</button>
-				<button type="button" id="GPL" class="btn btn-secondary station-btn">GPL</button>
+				<button type="button" id="GPLc" class="btn btn-secondary station-btn">GPL</button>
 				<button type="button" id="E85" class="btn btn-secondary station-btn">E85</button>
 				</form>
 		</a>
 		<a class="item" style="height: 30em;">
-			<span class="status"></span>
+			<div class="loader" id="loader"></div>
+
+			<table id="stations_table" class="table">
+
+				<tbody class="table_body" id="table_body">
+					{% include 'stations_table.html' %}
+				</tbody>
+			</table>
 		</a>
 	</div>
 
@@ -55,6 +61,8 @@
 	</div>
 
 	<script type="text/javascript">
+
+
 		//**********SIDE NAV***************
 		$('.sidebar-head').click(function(){
 			$('.ui.labeled.icon.sidebar').sidebar('toggle');
@@ -64,22 +72,45 @@
 			update_stations(e.target.id);
 		});
 
+		function showPage() {
+  			document.getElementById("loader").style.display = "none";
+  			document.getElementById("stations_table").style.display = "block";
+		}
+
+		function showLoader() {
+  			document.getElementById("loader").style.display = "block";
+  			document.getElementById("stations_table").style.display = "none";
+		}
+
+		function checkIfLoaded(){
+			if (document.getElementById("table_body").children.length > 0){
+				showPage();
+			}
+			else{
+				setTimeout(checkIfLoaded, 100);
+			}
+		}
+	
 		function update_stations(petrol_type) {
+			showLoader();
 			var bbox = ''
 			map.getView().calculateExtent(map.getSize()).forEach(coor => {
 				bbox += coor + ','
 			});
 
-			$.ajax({
-			method: "GET",
-			url: "/station/",
-			data: {'bbox': bbox, 'petrol_type': petrol_type},
-			success: function(data) {
-				console.log(data) // check out how data is structured
-				$('.status').contents()[0].textContent = 'Balance&nbsp'+data.stations
+			console.log(map.getView().getZoom());
+
+			if (map.getView().getZoom() > 10){
+				$('.table_body').html('').load("{% url 'station' %}?bbox="+bbox+"&petrol_type="+petrol_type);
 			}
-			})
+			else{
+				$('.table_body').html('').load("{% url 'station' %}?error=zoom");
+			}
+
+			checkIfLoaded();
+
 		};
+
 
 		//**********************************
 
@@ -277,8 +308,8 @@
 			coord = evt.coordinate,
 			address = evt.address;
 		// some popup solution
-		content.innerHTML = '<p>'+ address.formatted +'</p>';
-		overlay.setPosition(coord);
+		//content.innerHTML = '<p>'+ address.formatted +'</p>';
+		//overlay.setPosition(coord);
 		});
 
 		//***************************

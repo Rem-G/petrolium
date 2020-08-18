@@ -1,0 +1,79 @@
+{% load static %}
+{% static "" as baseUrl %}
+
+{% if error %}
+	<tr>
+		<td>
+			<div class="alert alert-danger" role="alert" style="width: 70%; left:50%; margin-left:-35%; position:fixed;">Merci de zoomer pour afficher les stations disponibles.</div>
+		</td>
+	</tr>
+
+{% else %}
+
+	{% for station in stations %}
+	<tr>
+		<td style='color: white; border:none'>
+			<div class="card container" style="width: 200%; left:50%; margin-left:-30%; position:relative; color: black; height: 10em; background-color: #FFFFF4">
+				<div class="row d-flex">
+					<div class="col-3 d-flex justify-content-center">
+						<img style="width:66px; height:66px; top:50%; margin-top:33px;" src="{{ baseUrl }}/img/{{ station.properties.img }}.png"></img>
+					</div>
+					<div class="col-2 d-flex justify-content-center">
+						<table>
+							<tr>
+								<td>
+									{% if station.properties.img == "independant" %}
+										<h3>Station service</h3>
+									{% else %}
+										<h3>{{ station.properties.name }}</h3>
+									{% endif %}
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<h5>{{ station.properties.adresse }} <br> {{ station.properties.ville}} </h5>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="col-5 d-flex justify-content-center">
+						<table>
+							<tr>
+								{% for prix in station.properties.prix %}
+									{% for key, value in prix.items %}
+										{% if key == '@nom' %}
+											<td>
+												{{ value }}
+											</td>
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							</tr>
+							<tr>
+								{% for prix in station.properties.prix %}
+									{% for key, value in prix.items %}
+										{% if key == '@valeur' %}
+											<td>
+												{{ value }}
+											</td>
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							</tr>
+						</table>
+					</div>
+					<div class="col-2 d-flex justify-content-center">
+						{% if station.properties.automate == "1" %}
+							<div class="alert alert-success" role="alert">24/24</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</td>
+	</tr>
+	{% endfor %}
+
+	{% if len_stations == 0 %}
+	<tr></tr>
+	{% endif %}
+{% endif %}

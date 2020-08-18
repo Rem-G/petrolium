@@ -40,6 +40,17 @@ class Petrol:
 					}
 
 		for pdv in doc.get('pdv_liste').get('pdv'):
+			horaires = pdv.get('horaires')
+			automate = None
+			if horaires:
+				automate = horaires.get('@automate-24-24')
+
+			ville = pdv.get('ville')
+			if ville is None:
+				ville = ""
+			else:
+				ville = ville.upper()
+
 			geo_json['features'].append(
 						{
 							"type": "Feature",
@@ -48,7 +59,9 @@ class Petrol:
 								"cp": pdv.get('@cp'),
 								"pop": pdv.get('@pop'),
 								"adresse": pdv.get('adresse'),
-								"ville": pdv.get('ville'),
+								"ville": ville,
+								"automate": automate,
+								"horaires": pdv.get('horaires'),
 								"services": pdv.get('services'),
 								"prix": pdv.get('prix')
 								},
@@ -97,36 +110,60 @@ class Petrol:
 
 	def findPetrol(self, value):
 		if isinstance(value['properties']['prix'], list):
+			#print('\n', value['properties']['prix'], '\n\n', value['properties'])
 			for prix in value['properties']['prix']:
-				# print(value['properties']['prix'], 'LEN', len(value['properties']['prix']), type(value['properties']['prix']))
-				# print(prix.get('@nom'))
 				if prix.get('@nom') == self.petrol_type:
-					print(float(prix['@valeur']))
 					return float(prix['@valeur'])
 		else:
 			if value['properties']['prix'].get('@nom') == self.petrol_type:
-				print(float(value['properties']['prix']['@valeur']))
 				return float(value['properties']['prix']['@valeur'])
+		return float('nan')
 
 
 	def sortStations(self, bbox, petrol_type):
 		self.petrol_type = petrol_type
-		stations_in_bbox = self.get_petrol_data(bbox)['features']
 
-		stations_with_petrol = []
+		stations_with_petrol = list()
 
-		for station in stations_in_bbox:
+		for station in self.get_petrol_data(bbox)['features']:
 			if isinstance(station['properties']['prix'], list):
 				for prix in station['properties']['prix']:
-					if prix.get('@nom') == petrol_type:
+					if prix.get('@nom') == self.petrol_type:
 						stations_with_petrol.append(station)
 			else:#dict
-				if prix.get('@nom') == petrol_type:
+				if prix.get('@nom') == self.petrol_type:
+					station['properties']['prix'] = [station['properties']['prix']]
 					stations_with_petrol.append(station)
 
 		sortedStations = sorted(stations_with_petrol, key=self.findPetrol)
+		nameStations = self.add_station_name(sortedStations)
 
-		return {'features': sortedStations}
+		return sortedStations
+
+	def add_station_name(self, stations):
+		for i, station in enumerate(stations):
+			lon, lat = station['geometry']['coordinates']
+			url = 'https://nominatim.openstreetmap.org/search.php?type=fuel&q=fuel+near+[{},{}]&limit=1&format=jsonv2'.format(lat, lon)
+			res = requests.get(url)
+			res = res.json()[0]
+			name = res['display_name'].split(',')[0]
+
+			station['properties']['name'] = name
+			station['properties']['img'] = 'independant'
+			for word in name.lower().replace('é', 'e').split(" "):
+				if word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+					station['properties']['img'] = word
+
+			stations[i] = station
+
+		return stations
+
+
+	def force_update(self):
+		os.remove(self.static_path + 'PrixCarburants_instantane.xml')
+		self.create_petrol_data()
+
+
 
 
 

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 
 from .utils import Petrol
@@ -13,9 +13,18 @@ def map(request):
     return JsonResponse(p.get_petrol_data(bbox))
 
 def station(request):
+    if request.GET.get('error') == 'zoom':
+        print('ZOOM ERROR')
+        return render(request, 'stations_table.html', {'error': True})
+
     bbox = request.GET.get('bbox')[:-1]
     petrol_type = request.GET.get('petrol_type')
+    stations = p.sortStations(bbox, petrol_type)
 
-    return JsonResponse(p.sortStations(bbox, petrol_type))
+    return render(request, 'stations_table.html', {'stations':stations, 'len_stations':len(stations)})
+
+def force_update(request):
+    p.force_update()
+    return redirect('/')
 
 
