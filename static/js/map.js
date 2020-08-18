@@ -269,7 +269,7 @@ positionFeature.setStyle(
         image: new ol.style.Circle({
             radius: 6,
             fill: new ol.style.Fill({
-                color: '#3399CC',
+                color: '#e37467',
             }),
             stroke: new ol.style.Stroke({
                 color: '#fff',
