@@ -43,6 +43,7 @@ html, body, #map{
 }
 .ol-popup-closer {
     text-decoration: none;
+    color: black;
     position: absolute;
     top: 2px;
     right: 8px;
@@ -98,8 +99,8 @@ html, body, #map{
   }
 
   .not-active {
-    pointer-events: none;
-    cursor: default;
-    text-decoration: none;
-    color: black;
-  }
+  pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+  color: black;
+}
