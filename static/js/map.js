@@ -5,7 +5,7 @@ $('.sidebar-head').click(function(){
 })
 
 $(".station-btn").click(function(e){
-    update_stations(e.target.id);
+    update_stations(e.target.id, "/station/");
 });
 
 function showPage() {
@@ -27,27 +27,21 @@ function checkIfLoaded(){
     }
 }
 
-function update_stations(petrol_type) {
+function update_stations(petrol_type, url) {
     showLoader();
     var bbox = ''
     map.getView().calculateExtent(map.getSize()).forEach(coor => {
         bbox += coor + ','
     });
 
-    console.log(map.getView().getZoom());
-
     if (map.getView().getZoom() > 10){
-        $('.table_body').html('').load("{% url 'station' %}?bbox="+bbox+"&petrol_type="+petrol_type);
+        $('.table_body').html('').load(url+"?bbox="+bbox+"&petrol_type="+petrol_type);
     }
     else{
-        $('.table_body').html('').load("{% url 'station' %}?error=zoom");
+        $('.table_body').html('').load(url+"?error=zoom");
     }
-
     checkIfLoaded();
-
 };
-
-
 //**********************************
 
 

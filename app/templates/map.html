@@ -30,12 +30,14 @@
 	<div class="ui bottom vertical inverted sidebar labeled icon menu">
 		<a class="item" style="height: 5em;">
 			<div class="container" style="margin:auto; left:100%">
-				<div class="row d-flex">
-					<div class="col-1 d-flex justify-content-center">
-						<button type="button" id="track" style="background-color:#e37467" class="btn btn-secondary">Track</button>
+				<div class="row justify-content-md-center">
+					<div class="col col-md-1">
+						<button type="button" id="track" style="background-color:#e37467" class="btn btn-secondary">
+							<i class="fas fa-location-arrow"></i>
+						</button>
 					</div>
 
-					<div class="col-6 d-flex justify-content-center">
+					<div class="col col-md-auto">
 						<form method="post" onsubmit="update_stations()">
 							{% csrf_token %}
 							<button type="button" id="Gazole" class="btn btn-secondary station-btn">Gazole</button>
