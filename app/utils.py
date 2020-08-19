@@ -157,10 +157,13 @@ class Petrol:
 					self.thread.start()
 
 				img = 'independant'
+				name_list = name.lower().replace('é', 'e').replace('è', 'e').split(" ")
 
-				for word in name.lower().replace('é', 'e').split(" "):
+				for i, word in enumerate(name_list):
 					if word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
 						img = word
+					elif i < len(name_list)-1 and word+name_list[i+1]+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+						img = word+name_list[i+1]
 
 				temp_station['properties']['img'] = img
 				temp_station['properties']['isopened'] = self.is_opened(temp_station)#Add if the station is opened
