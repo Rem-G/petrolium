@@ -151,7 +151,7 @@ var map = new ol.Map({
     ],
     view: new ol.View({
         constrainResolution: true,
-        center: [259817.27, 5439812.49],
+        center: [261260.284278, 6250950.865879],
         zoom: 11,
     })
 });
@@ -204,10 +204,10 @@ map.on('click', function(evt){
 
         //route
         if (feature.get('img') == 'independant' && feature.get('pop') == 'R'){
-            content = '<div class="col text-center justify-content-center"><h3>' + 'Station service' + '</h3></div>';
+            content = '<div class="col text-center "><h3>' + 'Station service' + '</h3></div>';
         }
         else if (feature.get('img') != 'independant' && feature.get('pop') == 'R'){
-            content = '<div class="col text-center justify-content-center"><h3>' + feature.get('name') + '</h3></div>';
+            content = '<div class="col text-center "><h3>' + feature.get('name') + '</h3></div>';
         }
 
         //Autoroute
