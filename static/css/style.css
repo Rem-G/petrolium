@@ -94,10 +94,6 @@ html, body, #map{
     100% { transform: rotate(360deg); }
   }
 
-  .stations_table {
-      overflow: auto;
-  }
-
   .not-active {
   pointer-events: none;
   cursor: default;

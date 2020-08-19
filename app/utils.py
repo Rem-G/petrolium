@@ -5,6 +5,7 @@ import zipfile
 import xmltodict
 import json
 import time
+import threading
 from pyproj import Proj, transform
 
 from django.conf import settings
@@ -14,21 +15,35 @@ class Petrol:
 	def __init__(self):
 		self.data_download_url = "https://donnees.roulez-eco.fr/opendata/instantane"
 		self.static_path = settings.MEDIA_ROOT + '/data/'
-		self.create_petrol_data()
-		self.geojson_data = self.xml_to_json(self.static_path, 'PrixCarburants_instantane')
+		self.geojson_data = None
 		self.petrol_type = None
+		self.create_petrol_data()
+		if not self.geojson_data:
+			self.geojson_data = self.xml_to_json(self.static_path, 'PrixCarburants_instantane')
+
+		self.thread = threading.Thread(target=self.create_json_stations, args=())
 
 	def download_petrol_data(self, requests_url, static_url, filename, chunk_size=128):
+		"""
+			Download data from donnees.roulez-eco.fr
+		"""
 		r = requests.get(requests_url, stream=True)
 		with open(static_url + filename, 'wb+') as fd:
 			for chunk in r.iter_content(chunk_size=chunk_size):
 				fd.write(chunk)
 
 	def extract_zip(self, static_url, filename):
+		"""
+			Extract downloaded zip
+		"""
 		with zipfile.ZipFile(static_url + filename,"r") as zip_ref:
 			zip_ref.extractall(static_url)
 
 	def xml_to_json(self, static_url, xml_name):
+		"""
+			Convert xml to json
+			Create the geojson
+		"""
 		with open(static_url + xml_name + '.xml', 'rb') as fd:
 			doc = xmltodict.parse(fd.read())
 
@@ -73,16 +88,92 @@ class Petrol:
 		return geo_json
 
 	def create_petrol_data(self):
+		"""
+			Download petrol data from donnees.roulez-eco.fr if the xml does not exists or is expired
+		"""
 		now = time.time()
+
 		if (not os.path.isfile(self.static_path + 'PrixCarburants_instantane.xml')
-			or os.path.getctime(self.static_path + 'PrixCarburants_instantane.xml') < 24*3600):
+			or os.path.getctime(self.static_path + 'PrixCarburants_instantane.xml') + 24*3600 < now):
 
 			self.download_petrol_data(self.data_download_url, self.static_path, 'data.zip')
 			self.extract_zip(self.static_path, 'data.zip')
 
+			self.geojson_data = self.xml_to_json(self.static_path, 'PrixCarburants_instantane')
+
 			os.remove(self.static_path + 'data.zip')
 
+	def get_station_name_nominatim(self, lat, lon):
+		"""
+			Return station name from nominatim
+		"""
+		url = 'https://nominatim.openstreetmap.org/search.php?type=fuel&q=fuel+near+[{},{}]&limit=1&format=jsonv2'.format(lat, lon)
+		res = requests.get(url).json()
+		if len(res):
+			name = res[0]['display_name'].split(',')[0]
+		else:
+			name='Station service'
+
+		return name
+
+	def create_json_stations(self):
+		"""
+			Create stations_name.json file
+			For each station nominatim finds the station name from its coordinates
+			/!\Takes a while/!\
+		"""
+		data = {'features': []}
+		for i, station in enumerate(self.geojson_data.get('features')):
+			lon, lat = station['geometry']['coordinates']
+			name = self.get_station_name_nominatim(lat, lon)
+			data['features'].append({'name': name, 'lon': lon, 'lat': lat})
+			print(name, i, '/', len(self.geojson_data.get('features')))
+
+		with open(self.static_path+'stations_name.json', 'w+') as f:
+			json.dump(data, f)
+
+	def get_station_name_json(self, json, lat, lon):
+		"""
+			Find the station name in stations_name.jsn from its coordinates
+		"""
+		return [obj['name'] for obj in json['features'] if obj['lat'] == lat and obj['lon'] == lon]
+
+	def add_station_name_isopened(self, stations):
+		"""
+			Add the station name to data from its coordinates
+		"""
+		with open(self.static_path+'stations_name.json', 'r') as f:
+			json_data = json.loads(f.read())
+			for i, temp_station in enumerate(stations):
+				lon, lat = temp_station['geometry']['coordinates']
+				name = self.get_station_name_json(json_data, lat, lon)[0]
+
+				if name:
+					temp_station['properties']['name'] = name
+				else:
+					temp_station['properties']['name'] = self.get_station_name_nominatim(lat, lon)
+					#There is an error in the json file
+					self.thread.daemon = True
+					self.thread.start()
+
+				img = 'independant'
+
+				for word in name.lower().replace('é', 'e').split(" "):
+					if word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+						img = word
+
+				temp_station['properties']['img'] = img
+				temp_station['properties']['isopened'] = self.is_opened(temp_station)#Add if the station is opened
+
+				stations[i] = temp_station
+
+		return stations
+
 	def get_petrol_data(self, bbox):
+		"""
+			Bbox filter
+			Return only the stations in the bbox
+		"""
 		bbox_list = [float(b) for b in bbox.split(',')]
 
 		inProj = Proj('EPSG:3857')
@@ -104,9 +195,14 @@ class Petrol:
 
 				geo_json['features'].append(feature)
 
+		geo_json_name = self.add_station_name_isopened(geo_json['features'])
+
 		return geo_json
 
 	def findPetrol(self, value):
+		"""
+			Key to sort petrol stations
+		"""
 		if isinstance(value['properties']['prix'], list):
 			#print('\n', value['properties']['prix'], '\n\n', value['properties'])
 			for prix in value['properties']['prix']:
@@ -118,7 +214,10 @@ class Petrol:
 		return float('nan')
 
 
-	def sortStations(self, bbox, petrol_type):
+	def sort_stations(self, bbox, petrol_type):
+		"""
+			Sort stations on petrol_type requested by the user
+		"""
 		self.petrol_type = petrol_type
 
 		stations_with_petrol = list()
@@ -134,28 +233,16 @@ class Petrol:
 					stations_with_petrol.append(station)
 
 		sortedStations = sorted(stations_with_petrol, key=self.findPetrol)
-		nameStations = self.add_station_name(sortedStations)
 
 		return sortedStations
 
-	def add_station_name(self, stations):
-		for i, station in enumerate(stations):
-			lon, lat = station['geometry']['coordinates']
-			url = 'https://nominatim.openstreetmap.org/search.php?type=fuel&q=fuel+near+[{},{}]&limit=1&format=jsonv2'.format(lat, lon)
-			res = requests.get(url)
-			res = res.json()[0]
-			name = res['display_name'].split(',')[0]
 
-			station['properties']['name'] = name
-			station['properties']['img'] = 'independant'
-			for word in name.lower().replace('é', 'e').split(" "):
-				if word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
-					station['properties']['img'] = word
-
-			stations[i] = station
-
-		return stations
-
+	def is_opened(self, station):
+		now = time.time()
+		if station['properties'].get('automate') == '1':
+			return True
+		return False
+		
 
 	def force_update(self):
 		os.remove(self.static_path + 'PrixCarburants_instantane.xml')
