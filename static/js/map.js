@@ -5,7 +5,7 @@ $('.sidebar-head').click(function(){
 })
 
 $(".station-btn").click(function(e){
-    update_stations(e.target.id, "/station/");
+    update_stations(e.target.value, "/station/");
 });
 
 function showPage() {
@@ -52,7 +52,6 @@ var vectorSource = new ol.source.Vector({
     loader: function(extent, resolution, projection) {
         var proj = projection.getCode();
         var url = '/map/?in_bbox=' + extent.join(',');
-        console.log(url);
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
         var onError = function() {
@@ -243,8 +242,6 @@ map.on('click', function(evt){
         
         content_element.innerHTML = content;
         overlay.setPosition(coord);
-        
-        console.info(feature.getProperties());
     }
 });
 

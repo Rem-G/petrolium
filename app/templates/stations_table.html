@@ -32,8 +32,8 @@
 								<h5>{{ station.properties.adresse }} <br> {{ station.properties.ville}} </h5>
 						</div><!-- /card-->
 					</div>
-					<div class="col-3 col-md-4 px-auto d-flex table-responsive justify-content-center">
-						<table class="table flip-scroll">
+					<div class="col-3 col-md-4 px-auto d-flex table-responsive justify-content-center flip-scroll">
+						<table class="table ">
 							{% for prix in station.properties.prix %}
 								<tr>
 								{% for key, value in prix.items %}

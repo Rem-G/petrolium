@@ -94,7 +94,7 @@ class Petrol:
 		now = time.time()
 
 		if (not os.path.isfile(self.static_path + 'PrixCarburants_instantane.xml')
-			or os.path.getctime(self.static_path + 'PrixCarburants_instantane.xml') + 24*3600 < now):
+			or os.path.getctime(self.static_path + 'PrixCarburants_instantane.xml') + 12*3600 < now):
 
 			self.download_petrol_data(self.data_download_url, self.static_path, 'data.zip')
 			self.extract_zip(self.static_path, 'data.zip')

@@ -29,7 +29,7 @@
 		<i class="fas fa-angle-up sidebar-head-angle"></i>
 	</div>
 	
-	<div class="ui bottom vertical inverted sidebar labeled icon menu">
+	<div class="ui sidebar bottom vertical inverted labeled icon menu">
 		<a class="item" style="height: 5em;">
 			<div class="container container-fluid">
 				<div class="row justify-content-center">
@@ -48,21 +48,21 @@
 						<form method="post" onsubmit="update_stations()">
 							{% csrf_token %}
 							<div class="btn-group d-none d-md-block d-lg-block d-xl-block" role="group">
-								<button type="button" id="Gazole" class="btn btn-secondary station-btn">Gazole</button>
-								<button type="button" id="SP95" class="btn btn-secondary station-btn">SP95</button>
-								<button type="button" id="E10" class="btn btn-secondary station-btn">SP95-E10</button>
-								<button type="button" id="SP98" class="btn btn-secondary station-btn">SP98</button>
-								<button type="button" id="GPLc" class="btn btn-secondary station-btn">GPL</button>
-								<button type="button" id="E85" class="btn btn-secondary station-btn">E85</button>
+								<button type="button" value="Gazole" class="btn btn-secondary station-btn">Gazole</button>
+								<button type="button" value="SP95" class="btn btn-secondary station-btn">SP95</button>
+								<button type="button" value="E10" class="btn btn-secondary station-btn">SP95-E10</button>
+								<button type="button" value="SP98" class="btn btn-secondary station-btn">SP98</button>
+								<button type="button" value="GPLc" class="btn btn-secondary station-btn">GPL</button>
+								<button type="button" value="E85" class="btn btn-secondary station-btn">E85</button>
 							</div>
 							<!-- Visible only on sm -->
 							<div class="btn-group btn-group-sm d-sm-block d-md-none" role="group">
-								<button type="button" id="Gazole" class="btn btn-secondary station-btn">Gazole</button>
-								<button type="button" id="SP95" class="btn btn-secondary station-btn">SP95</button>
-								<button type="button" id="E10" class="btn btn-secondary station-btn">SP95-E10</button>
-								<button type="button" id="SP98" class="btn btn-secondary station-btn">SP98</button>
-								<button type="button" id="GPLc" class="btn btn-secondary station-btn">GPL</button>
-								<button type="button" id="E85" class="btn btn-secondary station-btn">E85</button>
+								<button type="button" value="Gazole" class="btn btn-secondary station-btn">Gazole</button>
+								<button type="button" value="SP95" class="btn btn-secondary station-btn">SP95</button>
+								<button type="button" value="E10" class="btn btn-secondary station-btn">SP95-E10</button>
+								<button type="button" value="SP98" class="btn btn-secondary station-btn">SP98</button>
+								<button type="button" value="GPLc" class="btn btn-secondary station-btn">GPL</button>
+								<button type="button" value="E85" class="btn btn-secondary station-btn">E85</button>
 							</div>
 						</form>
 					</div>
@@ -84,9 +84,8 @@
 		</a>
 	</div>
 
-	  <div id="main pusher">
+	<div class="pusher">
 		<div id="map" class="map"></div>
-
 		<div id="popup" class="ol-popup">
 			<a href="#" id="popup-closer" class="ol-popup-closer"></a>
 			<div id="popup-content"></div>
