@@ -94,9 +94,103 @@ html, body, #map{
     100% { transform: rotate(360deg); }
   }
 
-  .not-active {
+  .not-active{
   pointer-events: none;
   cursor: default;
   text-decoration: none;
   color: black;
 }
+
+.active{
+    pointer-events: auto;
+    cursor: auto;
+    text-decoration: initial;
+    color: black;
+  }
+
+.station-img {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.table td.fit, 
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}
+.card-body {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+.text-response h3 {
+    font-size: calc(100% - 0.1vh - 0.1vw);
+  }
+
+.text-response h5 {
+    font-size: calc(100% - 0.1vh - 0.1vw);
+  }
+
+  @media only screen and (max-device-width: 480px) {
+    .btn-responsive {
+      font-size:80%;
+      line-height: 1;
+      border-radius:3px;
+    }
+
+    .responsive-table-display-sm{
+        font-size:80%;
+        display: block;
+    }
+
+    .responsive-table-display-md{
+        display: none;
+    }
+  }
+  
+  @media only screen and (min-device-width: 480px) {
+    .btn-responsive {
+      font-size:90%;
+      line-height: 1.2;
+    }
+    .responsive-table-display-sm{
+        display: none;
+    }
+
+    .responsive-table-display-md{
+        display: block;
+    }
+  }
+
+@media only screen and (max-width: 850px) {
+    h5{
+        font-size: 1px;
+    }
+    h3{
+        font-size: 15.44px;
+    }
+}
+
+@media only screen and (min-width: 800px) {
+
+    #flip-scroll .cf:after { visibility: hidden; display: block; font-size: 0; content: " "; clear: both; height: 0; }
+    #flip-scroll * html .cf { zoom: 1; }
+    #flip-scroll *:first-child+html .cf { zoom: 1; }
+
+    #flip-scroll table { width: 100%; border-collapse: unset; border-spacing: 0; }
+
+    #flip-scroll th,
+    #flip-scroll td { margin: 0; vertical-align: top; }
+    #flip-scroll th { text-align: left; }
+
+    #flip-scroll table { display: block; position: relative; width: 100%; }
+    #flip-scroll thead { display: block; float: left; }
+    #flip-scroll tbody { display: block; width: auto; position: relative; overflow-x: auto; white-space: nowrap; }
+    #flip-scroll thead tr { display: block; }
+    #flip-scroll th { display: block; text-align: right; }
+    #flip-scroll tbody tr { display: inline-block; vertical-align: top; }
+    #flip-scroll td { display: block; min-height: 1.25em; text-align: left; }
+
+    }

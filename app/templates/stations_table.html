@@ -11,66 +11,59 @@
 {% else %}
 	{% for station in stations %}
 	<tr>
-		<td style='color: white; border:none'>
-			<div class="card container" style="width: 200%; left:50%; margin-left:-30%; position:relative; color: black; height: 10em; background-color: #FFFFF4">
-				<div class="row d-flex">
-					<div class="col-3 d-flex justify-content-center">
-						<img style="width:66px; height:66px; top:50%; margin-top:33px;" src="{{ baseUrl }}img/{{ station.properties.img }}.png"></img>
+		<td class="fit" style='color: white; border:none'>
+			<div class="card container-fluid" style="color: black">
+				<div class="row">
+					<div class="col-2 col-md-2 d-flex justify-content-center station-img">
+						<img class="img-responsive" style="max-width: 66px; max-height: 66px;" src="{{ baseUrl }}img/{{ station.properties.img }}.png"></img>
 					</div>
-					<div class="col-2 d-flex justify-content-center">
-						<table>
-							<tr>
-								<td>
-									{% if station.properties.img == "independant" %}
-										<h3>Station service</h3>
-									{% else %}
-										<h3>{{ station.properties.name }}</h3>
-									{% endif %}
+					<div class="col-3 col-md-3 d-flex justify-content-center">
+						<div class="card" style="border:none;">
+							<div class="card-body">
+								{% if station.properties.img == "independant" %}
+									<h3>Station service</h3>
+								{% else %}
+									<h3>{{ station.properties.name }}</h3>
+								{% endif %}
 
-								</td>
 								{% if station.properties.pop == "A" %}
-								<td>
 									<img style="width:25px; height:25px;" src="{{ baseUrl }}img/autoroute32.png"></img>
-								</td>
-							{% endif %}
-							</tr>
-							<tr>
-								<td>
-									<h5>{{ station.properties.adresse }} <br> {{ station.properties.ville}} </h5>
-								</td>
-							</tr>
+								{% endif %}
+
+								<h5>{{ station.properties.adresse }} <br> {{ station.properties.ville}} </h5>
+							</div><!-- /card-body -->
+						</div><!-- /card-->
+					</div>
+					<div class="col-5 d-flex table-responsive justify-content-center">
+						<table class="table" id="flip-scroll">
+							{% for prix in station.properties.prix %}
+								<tr>
+								{% for key, value in prix.items %}
+									{% if key == '@nom' %}
+										<td>
+											{{ value }}
+										</td>
+									{% elif key == '@valeur' %}
+										<td>
+											{{ value }}
+										</td>
+									{% endif %}
+								{% endfor %}
+								</tr>
+							{% endfor %}
 						</table>
 					</div>
-					<div class="col-5 d-flex justify-content-center">
-						<table>
-							<tr>
-								{% for prix in station.properties.prix %}
-									{% for key, value in prix.items %}
-										{% if key == '@nom' %}
-											<td>
-												{{ value }}
-											</td>
-										{% endif %}
-									{% endfor %}
-								{% endfor %}
-							</tr>
-							<tr>
-								{% for prix in station.properties.prix %}
-									{% for key, value in prix.items %}
-										{% if key == '@valeur' %}
-											<td>
-												{{ value }}
-											</td>
-										{% endif %}
-									{% endfor %}
-								{% endfor %}
-							</tr>
-						</table>
-					</div>
-					<div class="col-2 d-flex justify-content-center">
-						{% if station.properties.automate == "1" %}
-							<div class="alert alert-success" role="alert">24/24</div>
-						{% endif %}
+					<div class="col-2 col-md-2 d-flex justify-content-center">
+						<div class="container my-auto">
+							<div class="row justify-content-center">
+								{% if station.properties.automate == "1" %}
+									<div class="alert alert-success btn-responsive" role="alert">24/24</div>
+								{% endif %}
+							</div>
+							<div class="row justify-content-center">
+								<button type="button" class="btn btn-sm btn-responsive btn-secondary">Plus d'infos</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
