@@ -75,7 +75,7 @@ var vectorSource = new ol.source.Vector({
 ////***************************
 
 //*******STATIONS LAYER********
-var petrol_station_svg = '<svg width="40px" height="40px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gas-pump" class="svg-inline--fa fa-gas-pump fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z"></path></svg>';
+var petrol_station_svg = '<svg width="45px" height="45px" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="gas-pump" class="svg-inline--fa fa-gas-pump fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M336 448H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h320c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm157.2-340.7l-81-81c-6.2-6.2-16.4-6.2-22.6 0l-11.3 11.3c-6.2 6.2-6.2 16.4 0 22.6L416 97.9V160c0 28.1 20.9 51.3 48 55.2V376c0 13.2-10.8 24-24 24s-24-10.8-24-24v-32c0-48.6-39.4-88-88-88h-8V64c0-35.3-28.7-64-64-64H96C60.7 0 32 28.7 32 64v352h288V304h8c22.1 0 40 17.9 40 40v27.8c0 37.7 27 72 64.5 75.9 43 4.3 79.5-29.5 79.5-71.7V152.6c0-17-6.8-33.3-18.8-45.3zM256 192H96V64h160v128z"></path></svg>';
 
 var iconStyle = new ol.style.Style({
     image: new ol.style.Icon({
@@ -189,16 +189,19 @@ var fullscreen = new ol.control.FullScreen();
 map.addControl(fullscreen);
 
 map.on('click', function(evt){
-    var feature = map.forEachFeatureAtPixel(evt.pixel,
+    var feature = map.forEachFeatureAtPixel(
+        evt.pixel,
         function(feature, layer) {
             return feature;
-        });
+        },
+        {hitTolerance: 8}
+        );
     if (feature.get('id')) {
         var geometry = feature.getGeometry();
         var coord = geometry.getCoordinates();
 
         feature.setStyle(highlightStyle);
-        var content = '<div class="container container-fluid col-md-4"><div class="row">';
+        var content = '<div class="container-fluid col-md-4"><div class="row">';
 
         //route
         if (feature.get('img') == 'independant' && feature.get('pop') == 'R'){
@@ -210,26 +213,26 @@ map.on('click', function(evt){
 
         //Autoroute
         if (feature.get('img') == 'independant' && feature.get('pop') == 'A'){
-            content = '<div class="col-md-2 text-center justify-content-center"><h3>' + 'Station service' + '</h3></div>';
+            content = '<div class="col-2 col-md-2 text-center justify-content-center"><h3>' + 'Station service' + '</h3></div>';
         }
         else if (feature.get('img') != 'independant' && feature.get('pop') == 'A'){
-            content = '<div class="col-md-2 text-center justify-content-center"><h3>' + feature.get('name') + '</h3></div>';
+            content = '<div class="col-2 col-md-2 text-center justify-content-center"><h3>' + feature.get('name') + '</h3></div>';
         }
 
         if (feature.get('pop') == 'A'){
-            content += '<div class="col-md-2 text-center"><img style="width:20px; height:20px;" src="/static/img/autoroute32.png"></img></div>';
+            content += '<div class="col-2 col-md-2 text-center"><img style="width:20px; height:20px;" src="/static/img/autoroute32.png"></img></div>';
         }
 
-        content += '</div><div class="row pt-3 justify-content-center">';
+        content += '</div><div class="row pt-3 text-center justify-content-center">';
         content += '<h5>' + feature.get('adresse') + '<br>' + feature.get('ville') + '</h5></div>';
 
         //Opened 
-        content += '<div class="row pt-3"><div class="col">';
+        content += '<div class="row pt-3 justify-content-center"><div class="col">';
         if (feature.get('isopened') == true){
             content += '<div class="badge badge-success text-center">Ouvert</div>';
         }
         else{
-            content += '<div class="badge badge-alert text-center">Fermé</div>';
+            content += '<div class="badge badge-danger text-center">Fermé</div>';
         }
         content += '</div></div>'
         //********/
