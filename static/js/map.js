@@ -44,7 +44,6 @@ function update_stations(petrol_type, url) {
 };
 //**********************************
 
-
 //**********DATA GETTER -> BBOX STRATEGY**********
 var vectorSource = new ol.source.Vector({
     format: new ol.format.GeoJSON(),
@@ -221,21 +220,21 @@ map.on('click', function(evt){
             content += '<div class="col-md-2 text-center"><img style="width:20px; height:20px;" src="/static/img/autoroute32.png"></img></div>';
         }
 
-        content += '</div><div class="row pt-3 text-center justify-content-center">';
+        content += '</div><div class="row pt-3 justify-content-center">';
         content += '<h5>' + feature.get('adresse') + '<br>' + feature.get('ville') + '</h5></div>';
 
         //Opened 
         content += '<div class="row pt-3"><div class="col">';
         if (feature.get('isopened') == true){
-            content += '<div class="alert alert-success text-center" role="alert">Ouvert</div>';
+            content += '<div class="badge badge-success text-center">Ouvert</div>';
         }
         else{
-            content += '<div class="alert alert-danger text-center" role="alert">Fermé</div>';
+            content += '<div class="badge badge-alert text-center">Fermé</div>';
         }
         content += '</div></div>'
         //********/
 
-        content += '<div class="row pt-1"><div class="col"><button type="button" class="btn btn-secondary text-center">Plus d\'infos</button></div></div>';
+        content += '<div class="row pt-1 justify-content-center"><div class="col"><button type="button" class="btn btn-secondary">Plus d\'infos</button></div></div>';
 
         content += '</div>'//container
         
