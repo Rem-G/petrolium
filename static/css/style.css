@@ -142,7 +142,7 @@ html, body, #map{
       }
 }
 
-@media only screen and (min-width: 800px) and (min-heighy: 400px) {
+@media only screen and (min-width: 800px) and (min-height: 400px) {
     .btn-responsive {
         font-size:90%;
         line-height: 1.2;
