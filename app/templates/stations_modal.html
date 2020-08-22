@@ -1,0 +1,37 @@
+{% load static %}
+{% static "" as baseUrl %}
+
+<div class="container-fluid" style="color: black">
+    {{ station_infos.properties }}
+
+
+    <div class="row">
+        <div class="col-3 col-md-4 px-auto d-flex table-responsive justify-content-center flip-scroll">
+            <table class="table ">
+                <thead>
+                    <tr>
+                      <th scope="col">Lundi</th>
+                      <th scope="col">Mardi</th>
+                      <th scope="col">Mecredi</th>
+                      <th scope="col">Jeudi</th>
+                      <th scope="col">Vendredi</th>
+                      <th scope="col">Samedi</th>
+                      <th scope="col">Dimanche</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row"></th>
+                        <td id="lundi">{{ station_infos.properties.horaires.jour.0 }}</td>
+                        <td id="mardi"></td>
+                        <td id="mercredi"></td>
+                        <td id="jeudi"></td>
+                        <td id="vendredi"></td>
+                        <td id="samedi"></td>
+                        <td id="dimanche"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

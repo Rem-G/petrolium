@@ -1,9 +1,8 @@
 //MODAL
 function update_modal(feature){
-    console.log(feature.get('name'));
     document.getElementById('stationModalTitle').innerHTML = feature.get('name');
+    $('.modal-body').html('').load('/station/'+'?station_id='+feature.get('id'));
 }
-
 //**** */
 
 //**********SIDE NAV***************
@@ -13,7 +12,7 @@ $('.sidebar-head').click(function(){
 })
 
 $(".station-btn").click(function(e){
-    update_stations(e.target.value, "/station/");
+    update_stations(e.target.value, "/stations/");
 });
 
 function showPage() {
@@ -80,6 +79,7 @@ var vectorSource = new ol.source.Vector({
                         adresse: feature.values_.adresse,
                         ville: feature.values_.ville,
                         automate: feature.values_.automate,
+                        isopened: feature.values_.isopened,
                         horaires: feature.values_.horaires,
                         services: feature.values_.services,
                         prix: feature.values_.prix,
@@ -268,6 +268,7 @@ map.on('click', function(evt){
 
         //Opened 
         content += '<div class="row pt-3 justify-content-center"><div class="col">';
+        console.log(feature);
         if (feature.get('isopened') == true){
             content += '<div class="badge badge-success text-center">Ouvert</div>';
         }

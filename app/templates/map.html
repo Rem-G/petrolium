@@ -92,7 +92,7 @@
 		</div>
 	</div>
 
-	<div class="modal fade" id="stationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" id="stationModal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 		  <div class="modal-content">
 			<div class="modal-header">
@@ -102,11 +102,7 @@
 			  </button>
 			</div>
 			<div class="modal-body">
-				<input type="text" name="bookId" id="bookId" value=""/>
-			</div>
-			<div class="modal-footer">
-			  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			  <button type="button" class="btn btn-primary">Save changes</button>
+				{% include 'stations_modal.html' %}
 			</div>
 		  </div>
 		</div>

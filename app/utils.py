@@ -17,7 +17,7 @@ class Petrol():
 		self.petrol_type = None
 		self.create_petrol_data()
 		with open(self.static_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
-			self.doc = xmltodict.parse(fd.read())
+			self.stations_data = xmltodict.parse(fd.read())
 
 		with open(self.static_path+'osm_stations.json', 'r') as f:
 			self.osm_data = json.loads(f.read())
@@ -38,6 +38,36 @@ class Petrol():
 		with zipfile.ZipFile(static_url + filename,"r") as zip_ref:
 			zip_ref.extractall(static_url)
 
+	
+	def create_horaires(self, horaires_pdv):
+		jours = {'0': 'lundi', '1': 'mardi', '2': 'mercredi', '3': 'jeudi', '4': 'vendredi', '5': 'samedi', '6': 'dimanche'}
+		horaires = {}
+		for key, value in jours.items():
+			current_day = horaires_pdv.get('jour')[int(key)]
+			if current_day.get('horaire'):
+				horaires[value+'-ferme'] = False
+
+				if isinstance(current_day.get('horaire'), list):
+					ouverture = list()
+					fermeture = list()
+					for period in current_day.get('horaire'):
+						ouverture.append(period.get('@ouverture'))
+						fermeture.append(period.get('@fermeture'))
+
+					horaires[value+'-ouverture'] = ' '.join(ouverture)
+					horaires[value+'-fermeture'] = ' '.join(fermeture)
+
+				else:
+					horaires[value+'-ouverture'] = current_day.get('horaire').get('@ouverture')
+					horaires[value+'-fermeture'] = current_day.get('horaire').get('@fermeture')
+
+
+			elif current_day.get('@ferme') == '1':
+				horaires[value+'-ferme'] = True
+
+		return horaires
+
+
 	def xml_to_json(self):
 		"""
 			Convert xml to json
@@ -48,11 +78,15 @@ class Petrol():
 						"features": []
 					}
 
-		for pdv in self.doc.get('pdv_liste').get('pdv'):
-			horaires = pdv.get('horaires')
-			automate = None
-			if horaires:
-				automate = horaires.get('@automate-24-24')
+		for pdv in self.stations_data.get('pdv_liste').get('pdv'):
+			horaires_pdv = pdv.get('horaires')
+
+			if horaires_pdv:
+				automate = False
+				if horaires_pdv.get('@automate-24-24') == '1':
+					automate = True
+
+				horaires = self.create_horaires(horaires_pdv)
 
 			ville = pdv.get('ville')
 			if ville is None:
@@ -70,7 +104,7 @@ class Petrol():
 								"adresse": pdv.get('adresse'),
 								"ville": ville,
 								"automate": automate,
-								"horaires": pdv.get('horaires'),
+								"horaires": horaires,
 								"services": pdv.get('services'),
 								"prix": pdv.get('prix')
 								},
@@ -121,9 +155,8 @@ class Petrol():
 				elif word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
 					img = word
 
-
-			temp_station['properties']['img'] = img
-			temp_station['properties']['isopened'] = self.is_opened(temp_station)#Add if the station is opened
+			temp_station['properties'].update({'isopened': self.is_opened(temp_station)})#Add if the station is opened
+			temp_station['properties'].update({'img': img})
 
 			stations[i] = temp_station
 
@@ -158,6 +191,10 @@ class Petrol():
 		geo_json_name = self.add_stations_info(geo_json['features'])
 
 		return geo_json
+
+
+	def get_station_infos(self, station_id):
+		return [station for station in self.xml_to_json().get('features') if station['properties'].get('id') == station_id]
 
 
 	################SORT STATIONS###################
@@ -203,7 +240,7 @@ class Petrol():
 
 	def is_opened(self, station):
 		now = time.time()
-		if station['properties'].get('automate') == '1':
+		if station['properties'].get('automate') :
 			return True
 		return False
 
@@ -286,7 +323,6 @@ class OSM(Petrol):
 					A_number = display_name[display_name.index('A')+1]
 					display_name[display_name.index('A')] = 'A' + A_number
 					display_name.remove(A_number)
-					print(display_name)
 				except Exception as e:
 					print(e)
 					pass
