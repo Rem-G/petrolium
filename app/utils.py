@@ -236,8 +236,9 @@ class OSM(Petrol):
 		for i, station in enumerate(geojson_data.get('features')):
 			lon, lat = station['geometry']['coordinates']
 			adresse = station['properties']['adresse'] + ' ' + station['properties']['ville']
+			pop = station['properties']['pop']
 
-			station_info = self.get_station_info_OSM(lon, lat, adresse)
+			station_info = self.get_station_info_OSM(lon, lat, adresse, pop)
 			OSM_coor = [float(c) for c in station_info['OSM_coor']]
 
 			features[str([lon, lat])] =  {'name': station_info['name'], 'OSM_coor': OSM_coor}
@@ -249,7 +250,7 @@ class OSM(Petrol):
 			json.dump(data, f)
 
 
-	def get_station_info_OSM(self, lon, lat, adresse):
+	def get_station_info_OSM(self, lon, lat, adresse, pop):
 		"""
 			Return station name from nominatim
 		"""
@@ -257,7 +258,7 @@ class OSM(Petrol):
 		res = requests.get(url).json()
 
 		if len(res):
-			OSM_pertinent_station = self.get_most_pertinent_OSM_station(res, adresse)
+			OSM_pertinent_station = self.get_most_pertinent_OSM_station(res, adresse, pop)
 			name = OSM_pertinent_station.get('OSM_name')
 			coor = OSM_pertinent_station.get('OSM_coor')
 		else:
@@ -267,7 +268,7 @@ class OSM(Petrol):
 		return {'name': name, 'OSM_coor': coor}
 
 
-	def get_most_pertinent_OSM_station(self, res, adresse):
+	def get_most_pertinent_OSM_station(self, res, adresse, pop):
 		"""
 		"""
 		matches = dict()
@@ -279,6 +280,17 @@ class OSM(Petrol):
 
 		for place in res:
 			display_name = place['display_name'].replace(',', '').replace('é', 'e').replace('è', 'e').upper().split(" ")
+			if pop.upper() == 'A' and 'A' in display_name:
+				try:
+					int(display_name[display_name.index('A')+1])
+					A_number = display_name[display_name.index('A')+1]
+					display_name[display_name.index('A')] = 'A' + A_number
+					display_name.remove(A_number)
+					print(display_name)
+				except Exception as e:
+					print(e)
+					pass
+
 			n_match = 0
 			for element in adresse:
 				if element in display_name:

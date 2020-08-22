@@ -80,7 +80,10 @@ var petrol_station_svg = '<svg width="45px" height="45px" aria-hidden="true" foc
 var iconStyle = new ol.style.Style({
     image: new ol.style.Icon({
             opacity: 0.6,
-            src: 'data:image/svg+xml;utf8,' + petrol_station_svg,
+            //src: 'data:image/svg+xml;utf8,' + petrol_station_svg,
+            src: function(feature){
+                return '/static/img/' + feature.properties.img + 'png';
+            }
         }),
     });
 
