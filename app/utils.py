@@ -19,6 +19,9 @@ class Petrol():
 		with open(self.static_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
 			self.doc = xmltodict.parse(fd.read())
 
+		with open(self.static_path+'osm_stations.json', 'r') as f:
+			self.osm_data = json.loads(f.read())
+
 	def download_petrol_data(self, requests_url, static_url, filename, chunk_size=128):
 		"""
 			Download data from donnees.roulez-eco.fr
@@ -98,12 +101,9 @@ class Petrol():
 		"""
 			Add name, isopened, OSM_coor of the station to data from its coordinates
 		"""
-		with open(self.static_path+'osm_stations.json', 'r') as f:
-			json_data = json.loads(f.read())
-
 		for i, temp_station in enumerate(stations):
 			lon, lat = temp_station['geometry']['coordinates']
-			station_info = json_data['features'].get(str([lon, lat]))
+			station_info = self.osm_data['features'].get(str([lon, lat]))
 
 			if not station_info:
 				#There is an error in the json file
