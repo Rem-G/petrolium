@@ -116,10 +116,11 @@ class Petrol():
 			station_name_as_list = temp_station['properties']['name'].lower().replace('é', 'e').replace('è', 'e').split(" ")
 
 			for index, word in enumerate(station_name_as_list):
-				if word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
-					img = word
-				elif index < len(station_name_as_list)-1 and word+station_name_as_list[index+1]+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+				if index < len(station_name_as_list)-1 and word+station_name_as_list[index+1]+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
 					img = word+station_name_as_list[index+1]
+				elif word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+					img = word
+
 
 			temp_station['properties']['img'] = img
 			temp_station['properties']['isopened'] = self.is_opened(temp_station)#Add if the station is opened
