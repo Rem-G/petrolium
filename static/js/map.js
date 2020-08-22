@@ -52,6 +52,7 @@ var vectorSource = new ol.source.Vector({
     loader: function(extent, resolution, projection) {
         var proj = projection.getCode();
         var url = '/map/?in_bbox=' + extent.join(',');
+        console.log(url);
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
         var onError = function() {

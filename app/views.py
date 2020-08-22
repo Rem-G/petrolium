@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 
-from .utils import Petrol
+from .utils import Petrol, OSM
 p = Petrol()
 
 
@@ -10,11 +10,11 @@ def home(request):
 
 def map(request):
     bbox = request.GET.get('in_bbox')
-    return JsonResponse(p.get_petrol_data(bbox))
+    json_data = p.get_petrol_data(bbox)
+    return JsonResponse(json_data)
 
 def station(request):
     if request.GET.get('error') == 'zoom':
-        print('ZOOM ERROR')
         return render(request, 'stations_table.html', {'error': True})
 
     bbox = request.GET.get('bbox')[:-1]
@@ -28,7 +28,8 @@ def force_update(request):
     return redirect('/')
 
 def force_json_stations(request):
-    p.create_json_stations()
-    return redirect('/')
+    osm = OSM()
+    osm.start_OSM_json_creation()
+    return redirect('/nada')
 
 

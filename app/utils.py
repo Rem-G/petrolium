@@ -10,18 +10,14 @@ from pyproj import Proj, transform
 
 from django.conf import settings
 
-
-class Petrol:
+class Petrol():
 	def __init__(self):
 		self.data_download_url = "https://donnees.roulez-eco.fr/opendata/instantane"
 		self.static_path = settings.MEDIA_ROOT + '/data/'
-		self.geojson_data = None
 		self.petrol_type = None
 		self.create_petrol_data()
-		if not self.geojson_data:
-			self.geojson_data = self.xml_to_json(self.static_path, 'PrixCarburants_instantane')
-
-		self.thread = threading.Thread(target=self.create_json_stations, args=())
+		with open(self.static_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
+			self.doc = xmltodict.parse(fd.read())
 
 	def download_petrol_data(self, requests_url, static_url, filename, chunk_size=128):
 		"""
@@ -39,20 +35,17 @@ class Petrol:
 		with zipfile.ZipFile(static_url + filename,"r") as zip_ref:
 			zip_ref.extractall(static_url)
 
-	def xml_to_json(self, static_url, xml_name):
+	def xml_to_json(self):
 		"""
 			Convert xml to json
 			Create the geojson
 		"""
-		with open(static_url + xml_name + '.xml', 'rb') as fd:
-			doc = xmltodict.parse(fd.read())
-
 		geo_json = {
 						"type": "FeatureCollection",
 						"features": []
 					}
 
-		for pdv in doc.get('pdv_liste').get('pdv'):
+		for pdv in self.doc.get('pdv_liste').get('pdv'):
 			horaires = pdv.get('horaires')
 			automate = None
 			if horaires:
@@ -99,76 +92,39 @@ class Petrol:
 			self.download_petrol_data(self.data_download_url, self.static_path, 'data.zip')
 			self.extract_zip(self.static_path, 'data.zip')
 
-			self.geojson_data = self.xml_to_json(self.static_path, 'PrixCarburants_instantane')
-
 			os.remove(self.static_path + 'data.zip')
 
-	def get_station_name_nominatim(self, lat, lon):
+	def add_stations_info(self, stations):
 		"""
-			Return station name from nominatim
+			Add name, isopened, OSM_coor of the station to data from its coordinates
 		"""
-		url = 'https://nominatim.openstreetmap.org/search.php?type=fuel&q=fuel+near+[{},{}]&limit=1&format=jsonv2'.format(lat, lon)
-		res = requests.get(url).json()
-		if len(res):
-			name = res[0]['display_name'].split(',')[0]
-		else:
-			name='Station service'
-
-		return name
-
-	def create_json_stations(self):
-		"""
-			Create stations_name.json file
-			For each station nominatim finds the station name from its coordinates
-			/!\Takes a while/!\
-		"""
-		data = {'features': []}
-		for i, station in enumerate(self.geojson_data.get('features')):
-			lon, lat = station['geometry']['coordinates']
-			name = self.get_station_name_nominatim(lat, lon)
-			data['features'].append({'name': name, 'lon': lon, 'lat': lat})
-			print(name, i, '/', len(self.geojson_data.get('features')))
-
-		with open(self.static_path+'stations_name.json', 'w+') as f:
-			json.dump(data, f)
-
-	def get_station_name_json(self, json, lat, lon):
-		"""
-			Find the station name in stations_name.jsn from its coordinates
-		"""
-		return [obj['name'] for obj in json['features'] if obj['lat'] == lat and obj['lon'] == lon]
-
-	def add_station_name_isopened(self, stations):
-		"""
-			Add the station name to data from its coordinates
-		"""
-		with open(self.static_path+'stations_name.json', 'r') as f:
+		with open(self.static_path+'osm_stations.json', 'r') as f:
 			json_data = json.loads(f.read())
-			for i, temp_station in enumerate(stations):
-				lon, lat = temp_station['geometry']['coordinates']
-				name = self.get_station_name_json(json_data, lat, lon)[0]
 
-				if name:
-					temp_station['properties']['name'] = name
-				else:
-					temp_station['properties']['name'] = self.get_station_name_nominatim(lat, lon)
-					#There is an error in the json file
-					self.thread.daemon = True
-					self.thread.start()
+		for i, temp_station in enumerate(stations):
+			lon, lat = temp_station['geometry']['coordinates']
+			station_info = json_data['features'].get(str([lon, lat]))
 
-				img = 'independant'
-				name_list = name.lower().replace('é', 'e').replace('è', 'e').split(" ")
+			if not station_info:
+				#There is an error in the json file
+				station_info = OSM().get_station_info_OSM(lat, lon, temp_station['properties']['adresse'])
 
-				for i, word in enumerate(name_list):
-					if word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
-						img = word
-					elif i < len(name_list)-1 and word+name_list[i+1]+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
-						img = word+name_list[i+1]
+			temp_station['properties']['name'] = station_info.get('name')
+			temp_station['geometry']['coordinates'] = station_info.get('OSM_coor')
 
-				temp_station['properties']['img'] = img
-				temp_station['properties']['isopened'] = self.is_opened(temp_station)#Add if the station is opened
+			img = 'independant'
+			station_name_as_list = temp_station['properties']['name'].lower().replace('é', 'e').replace('è', 'e').split(" ")
 
-				stations[i] = temp_station
+			for index, word in enumerate(station_name_as_list):
+				if word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+					img = word
+				elif index < len(station_name_as_list)-1 and word+station_name_as_list[index+1]+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+					img = word+station_name_as_list[index+1]
+
+			temp_station['properties']['img'] = img
+			temp_station['properties']['isopened'] = self.is_opened(temp_station)#Add if the station is opened
+
+			stations[i] = temp_station
 
 		return stations
 
@@ -189,7 +145,7 @@ class Petrol:
 						"features": []
 					}
 
-		for feature in self.geojson_data.get('features'):
+		for feature in self.xml_to_json().get('features'):
 			coor = feature['geometry']['coordinates']
 			if (coor[0] > x1
 				and coor[0] <= x2
@@ -198,10 +154,13 @@ class Petrol:
 
 				geo_json['features'].append(feature)
 
-		geo_json_name = self.add_station_name_isopened(geo_json['features'])
+		geo_json_name = self.add_stations_info(geo_json['features'])
 
 		return geo_json
 
+
+	################SORT STATIONS###################
+	################################################
 	def findPetrol(self, value):
 		"""
 			Key to sort petrol stations
@@ -214,8 +173,8 @@ class Petrol:
 		else:
 			if value['properties']['prix'].get('@nom') == self.petrol_type:
 				return float(value['properties']['prix']['@valeur'])
-		return float('nan')
 
+		return float('nan')
 
 	def sort_stations(self, bbox, petrol_type):
 		"""
@@ -238,21 +197,98 @@ class Petrol:
 		sortedStations = sorted(stations_with_petrol, key=self.findPetrol)
 
 		return sortedStations
-
+	######################################################################################
+	######################################################################################
 
 	def is_opened(self, station):
 		now = time.time()
 		if station['properties'].get('automate') == '1':
 			return True
 		return False
-		
+
 
 	def force_update(self):
 		os.remove(self.static_path + 'PrixCarburants_instantane.xml')
 		self.create_petrol_data()
 
 
+class OSM(Petrol):
+	def __init__(self):
+		super().__init__()
+		self.thread = threading.Thread(target=self.create_OSM_json, args=())
 
+	def start_OSM_json_creation(self):
+		self.thread.daemon = True
+		self.thread.start()
+
+	def create_OSM_json(self):
+		"""
+			Create stations_name.json file
+			For each station nominatim finds the station name from its coordinates
+			/!\Takes a while/!\
+		"""
+		data = {}
+		features = {}
+
+		geojson_data = self.xml_to_json()
+
+		for i, station in enumerate(geojson_data.get('features')):
+			lon, lat = station['geometry']['coordinates']
+			adresse = station['properties']['adresse'] + ' ' + station['properties']['ville']
+
+			station_info = self.get_station_info_OSM(lon, lat, adresse)
+			OSM_coor = [float(c) for c in station_info['OSM_coor']]
+
+			features[str([lon, lat])] =  {'name': station_info['name'], 'OSM_coor': OSM_coor}
+
+			print( i, '/', len(geojson_data.get('features')))
+		
+		data['features'] = features
+		with open(self.static_path+'osm_stations.json', 'w+') as f:
+			json.dump(data, f)
+
+
+	def get_station_info_OSM(self, lon, lat, adresse):
+		"""
+			Return station name from nominatim
+		"""
+		url = 'https://nominatim.openstreetmap.org/search.php?type=fuel&q=fuel+near+[{},{}]&limit=4&format=jsonv2'.format(lat, lon)
+		res = requests.get(url).json()
+
+		if len(res):
+			OSM_pertinent_station = self.get_most_pertinent_OSM_station(res, adresse)
+			name = OSM_pertinent_station.get('OSM_name')
+			coor = OSM_pertinent_station.get('OSM_coor')
+		else:
+			name = 'Station service'
+			coor = [lon, lat]#initial coor
+
+		return {'name': name, 'OSM_coor': coor}
+
+
+	def get_most_pertinent_OSM_station(self, res, adresse):
+		"""
+		"""
+		matches = dict()
+		loc = dict()
+		adresse = adresse.replace(',', '').replace('é', 'e').replace('è', 'e').upper().split(" ")
+		best_name = res[0]['display_name'].split(',')[0]
+		best_coor = [res[0]['lon'], res[0]['lat']]
+		best_match = 0
+
+		for place in res:
+			display_name = place['display_name'].replace(',', '').replace('é', 'e').replace('è', 'e').upper().split(" ")
+			n_match = 0
+			for element in adresse:
+				if element in display_name:
+					n_match += 1
+
+			if n_match > best_match:
+				best_name = place['display_name'].split(',')[0]
+				best_coor = [place['lon'], place['lat']]
+				best_match = n_match
+
+		return {'OSM_name': best_name, 'OSM_coor': best_coor}
 
 
 
