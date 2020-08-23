@@ -176,15 +176,12 @@ var StationsCluster = new ol.layer.Vector({
 
 //*********MAP********
 //Mapbox access_token
-var accessToken = 'pk.eyJ1IjoicGV0cm9saXVtIiwiYSI6ImNrZHliaHphcDFjcWcycnBpMTlpYmgycDMifQ.8Yn17qBucMsu4HelUb5VHg';
 
 var map = new ol.Map({
     target: 'map',
     layers: [
         new ol.layer.Tile({
-            source: new ol.source.XYZ({
-                url: 'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/256/{z}/{x}/{y}?access_token='+accessToken,
-            })
+            source: new ol.source.OSM(),
         }),
         PetroliumLayer,
        //StationsCluster,
@@ -232,33 +229,26 @@ map.on('click', function(evt){
         var geometry = feature.getGeometry();
         var coord = geometry.getCoordinates();
 
-        var content = '<div class="container-fluid col-md-4"><div class="row">';
+        var content = '<div class="container-fluid"><div class="row">';
 
         //route
-        if (feature.get('img') == 'independant' && feature.get('pop') == 'R'){
-            content = '<div class="col text-center "><h3>' + 'Station service' + '</h3></div>';
+        if (feature.get('img') == 'independant'){
+            content = '<div class="text-center "><h3>' + 'Station service' + '</h3></div>';
         }
-        else if (feature.get('img') != 'independant' && feature.get('pop') == 'R'){
-            content = '<div class="col text-center "><h3>' + feature.get('name') + '</h3></div>';
+        else if (feature.get('img') != 'independant'){
+            content = '<div class="text-center "><h3>' + feature.get('name') + '</h3></div>';
         }
 
         //Autoroute
-        if (feature.get('img') == 'independant' && feature.get('pop') == 'A'){
-            content = '<div class="col-2 col-md-2 text-center justify-content-center"><h3>' + 'Station service' + '</h3></div>';
-        }
-        else if (feature.get('img') != 'independant' && feature.get('pop') == 'A'){
-            content = '<div class="col-2 col-md-2 text-center justify-content-center"><h3>' + feature.get('name') + '</h3></div>';
-        }
-
         if (feature.get('pop') == 'A'){
-            content += '<div class="col-2 col-md-2 text-center"><img style="width:20px; height:20px;" src="/static/img/autoroute32.png"></img></div>';
+            content += '<div class="text-center"><img style="width:20px; height:20px;" src="/static/img/autoroute32.png"></img></div>';
         }
 
         content += '</div><div class="row pt-3 text-center justify-content-center">';
         content += '<h5>' + feature.get('adresse') + '<br>' + feature.get('ville') + '</h5></div>';
 
         //Opened 
-        content += '<div class="row pt-3 justify-content-center"><div class="col">';
+        content += '<div class="row pt-3 text-center justify-content-center"><div class="col">';
         if (feature.get('isopened') == true){
             content += '<div class="badge badge-success text-center">Ouvert</div>';
         }
@@ -268,7 +258,7 @@ map.on('click', function(evt){
         content += '</div></div>'
         //********/
 
-        content += '<div class="row pt-1 justify-content-center"><div class="col"><button type="button" data-toggle="modal" data-target="#stationModal" class="btn btn-secondary stationInfos">Plus d\'infos</button></div></div>';
+        content += '<div class="row pt-1 text-center justify-content-center"><div class="col"><button type="button" data-toggle="modal" data-target="#stationModal" class="btn btn-secondary stationInfos">Plus d\'infos</button></div></div>';
 
         content += '</div>'//container
         

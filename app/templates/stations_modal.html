@@ -4,13 +4,13 @@
 
 
 <div class="container-fluid" style="color: black">
-    <div class="row">
+    <div class="row justify-content-center text-center">
         <div class="py-2">
             <div class="container-fluid">
                 <div class="row">
                     <span>
                         <i class="fas fa-map-marker-alt"></i>
-                        {{ station_infos.properties.adresse }} {{station_infos.properties.ville }}
+                        {{ station_infos.properties.adresse }} - {{station_infos.properties.ville }}
                     </span>
                 </div>
                 <div class="row">
@@ -26,6 +26,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row justify-content-center text-center">
         <div class="table-responsive justify-content-center text-center">
             <table class="table">
                 <thead>
