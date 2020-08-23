@@ -1,6 +1,11 @@
 //MODAL
 function update_modal(feature){
-    document.getElementById('stationModalTitle').innerHTML = feature.get('name');
+    if(feature.get('img') == 'independant'){
+        document.getElementById('stationModalTitle').innerHTML = 'Station service';
+    }
+    else{
+        document.getElementById('stationModalTitle').innerHTML = feature.get('name');
+    }
     $('.modal-body').html('').load('/station/'+'?station_id='+feature.get('id'));
 }
 //**** */

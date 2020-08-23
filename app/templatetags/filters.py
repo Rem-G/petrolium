@@ -33,4 +33,6 @@ def get_infos_available(dictionary, key):
 
 @register.filter
 def get_automate(dictionary):
-    return dictionary.get('automate')
+    if dictionary and dictionary.get('automate'):
+        return dictionary.get('automate')
+    return False

@@ -59,7 +59,7 @@
 								{% endif %}
 							</div>
 							<div class="row justify-content-center my-auto pt-2">
-								<button type="button" class="btn btn-sm btn-secondary btn-responsive">Plus<br>d'infos</button>
+								<button type="button" data-toggle="modal" data-target="#stationModal" value="{{station.properties.name}},{{station.properties.id}},{{station.properties.img}}" class="btn btn-sm btn-secondary btn-responsive btn-table-infos">Plus<br>d'infos</button>
 							</div>
 						</div>
 					</div>
@@ -73,3 +73,20 @@
 		<tr></tr>
 	{% endif %}
 {% endif %}
+
+<script>
+	$('.btn-table-infos').click(function(e){
+		var value = e.target.value.split(',');
+		var name = value[0],
+			id = value[1],
+			img = value[2];
+
+		if(img == 'independant'){
+			document.getElementById('stationModalTitle').innerHTML = 'Station service';
+		}
+		else{
+			document.getElementById('stationModalTitle').innerHTML = name;
+		}
+		$('.modal-body').html('').load('/station/'+'?station_id='+id);
+	})
+</script>
