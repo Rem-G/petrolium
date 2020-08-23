@@ -251,10 +251,10 @@ map.on('click', function(evt){
         if (feature.get('isopened') != null){
             content += '<div class="row pt-3 text-center justify-content-center"><div class="col">';
             if (feature.get('isopened') == true){
-                content += '<div class="badge badge-success text-center">Ouvert</div>';
+                content += '<h3><div class="badge badge-success text-center">Ouvert</div></h3>';
             }
             else{
-                content += '<div class="badge badge-danger text-center">Fermé</div>';
+                content += '<h3><div class="badge badge-danger text-center">Fermé</div></h3>';
             }
             content += '</div></div>'
         }

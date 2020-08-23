@@ -25,7 +25,12 @@ def stations(request):
 def station_infos(request):
     station_id = request.GET.get('station_id')
     station_infos = p.get_station_infos(station_id)[0]
-    return render(request, 'stations_modal.html', {'station_infos': station_infos, 'jours': ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']})
+    len_services = None
+
+    if station_infos['properties'].get('services'):
+        len_services = len(station_infos['properties'].get('services'))
+
+    return render(request, 'stations_modal.html', {'station_infos': station_infos, 'jours': ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], 'len_services': len_services})
 
 
 def force_update(request):

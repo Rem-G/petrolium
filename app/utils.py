@@ -71,6 +71,14 @@ class Petrol():
 
 		return horaires
 
+	def create_services(self, services_pdv):
+		if services_pdv:
+			services = services_pdv.get('service')
+			if isinstance(services, list):
+				return services
+			return [services]
+		return None
+
 
 	def xml_to_json(self):
 		"""
@@ -92,6 +100,8 @@ class Petrol():
 
 				horaires = self.create_horaires(horaires_pdv)
 
+			services = self.create_services(pdv.get('services'))
+
 			ville = pdv.get('ville')
 			if ville is None:
 				ville = ""
@@ -109,7 +119,7 @@ class Petrol():
 								"ville": ville,
 								"automate": automate,
 								"horaires": horaires,
-								"services": pdv.get('services'),
+								"services": services,
 								"prix": pdv.get('prix')
 								},
 							"geometry": {
