@@ -124,7 +124,7 @@ var PetroliumLayer = new ol.layer.Vector({
             },
     updateWhileAnimating: false,
     updateWhileInteracting: false,
-    minZoom: 12
+    minZoom: 9
 });
 ////***************************
 
@@ -163,8 +163,8 @@ var StationsCluster = new ol.layer.Vector({
         }
         return style;
     },
-    maxZoom: 12,
-    minZoom: 9
+    maxZoom: 11,
+    minZoom: 10
 });
 //***************************
 
@@ -182,7 +182,7 @@ var map = new ol.Map({
             })
         }),
         PetroliumLayer,
-        StationsCluster,
+       //StationsCluster,
     ],
     view: new ol.View({
         constrainResolution: true,

@@ -44,8 +44,9 @@ class Petrol():
 		horaires = {}
 		for key, value in jours.items():
 			current_day = horaires_pdv.get('jour')[int(key)]
+			day = {}
 			if current_day.get('horaire'):
-				horaires[value+'-ferme'] = False
+				day['ferme'] = False
 
 				if isinstance(current_day.get('horaire'), list):
 					ouverture = list()
@@ -54,16 +55,18 @@ class Petrol():
 						ouverture.append(period.get('@ouverture'))
 						fermeture.append(period.get('@fermeture'))
 
-					horaires[value+'-ouverture'] = ' '.join(ouverture)
-					horaires[value+'-fermeture'] = ' '.join(fermeture)
+					day['ouverture'] = ' - '.join(ouverture)
+					day['fermeture'] = ' - '.join(fermeture)
 
 				else:
-					horaires[value+'-ouverture'] = current_day.get('horaire').get('@ouverture')
-					horaires[value+'-fermeture'] = current_day.get('horaire').get('@fermeture')
+					day['ouverture'] = current_day.get('horaire').get('@ouverture')
+					day['fermeture'] = current_day.get('horaire').get('@fermeture')
 
 
 			elif current_day.get('@ferme') == '1':
-				horaires[value+'-ferme'] = True
+				day['ferme'] = True
+
+			horaires[value] = day
 
 		return horaires
 
@@ -124,7 +127,7 @@ class Petrol():
 		now = time.time()
 
 		if (not os.path.isfile(self.static_path + 'PrixCarburants_instantane.xml')
-			or os.path.getctime(self.static_path + 'PrixCarburants_instantane.xml') + 12*3600 < now):
+			or os.path.getctime(self.static_path + 'PrixCarburants_instantane.xml') + 20*60 < now):
 
 			self.download_petrol_data(self.data_download_url, self.static_path, 'data.zip')
 			self.extract_zip(self.static_path, 'data.zip')

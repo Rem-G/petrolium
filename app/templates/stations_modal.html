@@ -1,34 +1,60 @@
 {% load static %}
 {% static "" as baseUrl %}
+{% load filters %}
+
 
 <div class="container-fluid" style="color: black">
-    {{ station_infos.properties }}
-
-
     <div class="row">
-        <div class="col-3 col-md-4 px-auto d-flex table-responsive justify-content-center flip-scroll">
-            <table class="table ">
+        <div class="table-responsive justify-content-center text-center">
+            <table class="table">
                 <thead>
                     <tr>
-                      <th scope="col">Lundi</th>
-                      <th scope="col">Mardi</th>
-                      <th scope="col">Mecredi</th>
-                      <th scope="col">Jeudi</th>
-                      <th scope="col">Vendredi</th>
-                      <th scope="col">Samedi</th>
-                      <th scope="col">Dimanche</th>
+                        <th scope="col"></th>
+                        {% for jour in jours %}
+                            <th scope="col">{{ jour }}</th>
+                        {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <th scope="row"></th>
-                        <td id="lundi">{{ station_infos.properties.horaires.jour.0 }}</td>
-                        <td id="mardi"></td>
-                        <td id="mercredi"></td>
-                        <td id="jeudi"></td>
-                        <td id="vendredi"></td>
-                        <td id="samedi"></td>
-                        <td id="dimanche"></td>
+                        <th scope="row">Ouverture</th>
+                        {% for jour in jours %}
+                            {% if station_infos.properties.horaires|get_ferme:jour %}
+                                <td>
+                                    <div class="badge badge-danger text-center">Fermé</div>
+                                </td>
+                            {% elif station_infos.properties|get_automate and not station_infos.properties.horaires|get_infos_available:jour%}
+                                <td>
+                                    <div class="badge badge-success text-center">24h/24</div>
+                                </td>
+                            {% elif not station_infos.properties.horaires|get_infos_available:jour %}
+                                <td>
+                                    <div class="badge badge-warning text-center">Indisponible</div>
+                                </td>
+                            {% else %}
+                                <td>{{ station_infos.properties.horaires|get_ouverture:jour }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Fermeture</th>
+                        {% for jour in jours %}
+                            {% if station_infos.properties.horaires|get_ferme:jour %}
+                                <td>
+                                    <div class="badge badge-danger text-center">Fermé</div>
+                                </td>
+                            {% elif station_infos.properties|get_automate and not station_infos.properties.horaires|get_infos_available:jour%}
+                                <td>
+                                    <div class="badge badge-success text-center">24h/24</div>
+                                </td>
+                            {% elif not station_infos.properties.horaires|get_infos_available:jour %}
+                                <td>
+                                    <div class="badge badge-warning text-center">Indisponible</div>
+                                </td>
+                            {% else %}
+                                <td>{{ station_infos.properties.horaires|get_fermeture:jour }}</td>
+                            {% endif %}
+                        {% endfor %}
                     </tr>
                 </tbody>
             </table>
