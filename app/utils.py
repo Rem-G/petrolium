@@ -4,6 +4,7 @@ import os
 import zipfile
 import xmltodict
 import json
+import datetime
 import time
 import threading
 from pyproj import Proj, transform
@@ -15,6 +16,7 @@ class Petrol():
 		self.data_download_url = "https://donnees.roulez-eco.fr/opendata/instantane"
 		self.static_path = settings.MEDIA_ROOT + '/data/'
 		self.petrol_type = None
+		self.jours = {'0': 'lundi', '1': 'mardi', '2': 'mercredi', '3': 'jeudi', '4': 'vendredi', '5': 'samedi', '6': 'dimanche'}
 		self.create_petrol_data()
 		with open(self.static_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
 			self.stations_data = xmltodict.parse(fd.read())
@@ -40,9 +42,8 @@ class Petrol():
 
 	
 	def create_horaires(self, horaires_pdv):
-		jours = {'0': 'lundi', '1': 'mardi', '2': 'mercredi', '3': 'jeudi', '4': 'vendredi', '5': 'samedi', '6': 'dimanche'}
 		horaires = {}
-		for key, value in jours.items():
+		for key, value in self.jours.items():
 			current_day = horaires_pdv.get('jour')[int(key)]
 			day = {}
 			if current_day.get('horaire'):
@@ -242,10 +243,49 @@ class Petrol():
 	######################################################################################
 
 	def is_opened(self, station):
-		now = time.time()
+		current_day = self.jours[str(datetime.datetime.today().weekday())]
+		now = str(datetime.datetime.now()).split(' ')
+		hour = int(now[1].split(':')[0])
+		minutes = int(now[1].split(':')[1])
+
 		if station['properties'].get('automate') :
 			return True
-		return False
+		
+		ouverture = station['properties'].get('horaires').get(current_day).get('ouverture')
+		fermeture = station['properties'].get('horaires').get(current_day).get('fermeture')
+		ferme = station['properties'].get('horaires').get(current_day).get('ferme')
+
+		if ferme:
+			return False
+
+		elif not(ouverture and fermeture):
+			return None
+
+		elif '-' in ouverture:
+			ouverture = ouverture.split(' - ')
+			fermeture = fermeture.split(' - ')
+
+			for ouv in ouverture:
+				ouv = ouv.split('.')
+				if hour < int(ouv[0]) and minutes < int(ouv[1]):
+					return False
+
+			for ferm in fermeture:
+				ferm = ferm.split('.')
+				if hour > int(ferm[0]) and minutes > int(ferm[1]):
+					return False
+
+		else:
+			ouv = ouverture.split('.')
+			ferm = fermeture.split('.')
+
+			if hour < int(ouv[0]) and minutes < int(ouv[1]):
+				return False
+
+			if hour > int(ferm[0]) and minutes > int(ferm[1]):
+				return False
+
+		return True
 
 
 	def force_update(self):

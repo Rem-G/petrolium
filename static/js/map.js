@@ -46,7 +46,7 @@ function update_stations(petrol_type, url) {
         bbox += coor + ','
     });
 
-    if (map.getView().getZoom() > 10){//Limit to request stations table
+    if (map.getView().getZoom() > 9){//Limit to request stations table
         $('.table_body').html('').load(url+"?bbox="+bbox+"&petrol_type="+petrol_type);
     }
     else{
@@ -247,15 +247,17 @@ map.on('click', function(evt){
         content += '</div><div class="row pt-3 text-center justify-content-center">';
         content += '<h5>' + feature.get('adresse') + '<br>' + feature.get('ville') + '</h5></div>';
 
-        //Opened 
-        content += '<div class="row pt-3 text-center justify-content-center"><div class="col">';
-        if (feature.get('isopened') == true){
-            content += '<div class="badge badge-success text-center">Ouvert</div>';
+        //Opened
+        if (feature.get('isopened') != null){
+            content += '<div class="row pt-3 text-center justify-content-center"><div class="col">';
+            if (feature.get('isopened') == true){
+                content += '<div class="badge badge-success text-center">Ouvert</div>';
+            }
+            else{
+                content += '<div class="badge badge-danger text-center">Fermé</div>';
+            }
+            content += '</div></div>'
         }
-        else{
-            content += '<div class="badge badge-danger text-center">Fermé</div>';
-        }
-        content += '</div></div>'
         //********/
 
         content += '<div class="row pt-1 text-center justify-content-center"><div class="col"><button type="button" data-toggle="modal" data-target="#stationModal" class="btn btn-secondary stationInfos">Plus d\'infos</button></div></div>';

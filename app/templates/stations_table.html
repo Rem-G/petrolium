@@ -54,8 +54,12 @@
 					<div class="col-2 col-md-2 d-flex justify-content-center">
 						<div class="container my-auto">
 							<div class="row justify-content-center my-auto">
-								{% if station.properties.automate %}
-									<div class="badge badge-success">Ouvert</div>
+								{% if station.properties.isopened is not None %}
+									{% if station.properties.isopened %}
+										<div class="badge badge-success">Ouvert</div>
+									{% else %}
+										<div class="badge badge-danger">Fermé</div>
+									{% endif %}
 								{% endif %}
 							</div>
 							<div class="row justify-content-center my-auto pt-2">
