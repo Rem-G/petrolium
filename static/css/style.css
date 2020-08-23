@@ -181,3 +181,8 @@ html, body, #map{
     overflow-x: auto;
     word-break:break-all;
 }
+
+.card-scroll{
+    max-height: 150px;
+    overflow-y: scroll;
+}

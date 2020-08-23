@@ -91,6 +91,9 @@
 		else{
 			document.getElementById('stationModalTitle').innerHTML = name;
 		}
+
+		$("#img-modal-input").attr("value", img);
 		$('.modal-body').html('').load('/station/'+'?station_id='+id);
+
 	})
 </script>

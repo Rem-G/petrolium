@@ -6,6 +6,8 @@ function update_modal(feature){
     else{
         document.getElementById('stationModalTitle').innerHTML = feature.get('name');
     }
+    $("#img-modal-input").attr("value", feature.get('img'));
+
     $('.modal-body').html('').load('/station/'+'?station_id='+feature.get('id'));
 }
 //**** */
@@ -93,7 +95,7 @@ var vectorSource = new ol.source.Vector({
                   
                     var iconStyle = new ol.style.Style({
                       image: new ol.style.Icon({
-                        opacity: 0.8,
+                        opacity: 0.9,
                         anchor: [0.5, 33],
                         anchorXUnits: 'fraction',
                         anchorYUnits: 'pixels',
@@ -135,42 +137,43 @@ var PetroliumLayer = new ol.layer.Vector({
 
 
 //******CLUSTERS LAYER*******
-var clusterSource = new ol.source.Cluster({
-    source: vectorSource,
-});
+// var clusterSource = new ol.source.Cluster({
+//     distance: 400,
+//     source: vectorSource,
+// });
 
-var styleCache = {};
+// var styleCache = {};
 
-var StationsCluster = new ol.layer.Vector({
-    source: clusterSource,
-    style: function(feature) {
-        var size = feature.get('features').length;
-        var style = styleCache[size];
-        if (!style) {
-            style = new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 10,
-                    stroke: new ol.style.Stroke({
-                    color: '#fff'
-                    }),
-                    fill: new ol.style.Fill({
-                        color: '#3399CC'
-                    })
-                }),
-                text: new ol.style.Text({
-                    text: size.toString(),
-                    fill: new ol.style.Fill({
-                        color: '#fff'
-                    })
-                })
-            });
-            styleCache[size] = style;
-        }
-        return style;
-    },
-    maxZoom: 11,
-    minZoom: 10
-});
+// var StationsCluster = new ol.layer.Vector({
+//     source: clusterSource,
+//     style: function(feature) {
+//         var size = feature.get('features').length;
+//         var style = styleCache[size];
+//         if (!style) {
+//             style = new ol.style.Style({
+//                 image: new ol.style.Circle({
+//                     radius: 10,
+//                     stroke: new ol.style.Stroke({
+//                     color: '#fff'
+//                     }),
+//                     fill: new ol.style.Fill({
+//                         color: '#3399CC'
+//                     })
+//                 }),
+//                 text: new ol.style.Text({
+//                     text: size.toString(),
+//                     fill: new ol.style.Fill({
+//                         color: '#fff'
+//                     })
+//                 })
+//             });
+//             styleCache[size] = style;
+//         }
+//         return style;
+//     },
+//     maxZoom: 10,
+//     minZoom: 8,
+// });
 //***************************
 
 
@@ -184,7 +187,7 @@ var map = new ol.Map({
             source: new ol.source.OSM(),
         }),
         PetroliumLayer,
-       //StationsCluster,
+        //StationsCluster,
     ],
     view: new ol.View({
         constrainResolution: true,
@@ -270,21 +273,21 @@ map.on('click', function(evt){
     }
 });
 
-var selected = null;
+// var selected = null;
 
-map.on('pointermove', function (e) {
-    if (selected !== null) {
-        selected.setStyle(undefined);
-        selected = null;
-    }
+// map.on('pointermove', function (e) {
+//     if (selected !== null) {
+//         selected.setStyle(undefined);
+//         selected = null;
+//     }
 
-    map.forEachFeatureAtPixel(e.pixel, function (f) {
-        if (f.get('id')) {
-            selected = f;
-            return true;
-        }
-    });
-});
+//     map.forEachFeatureAtPixel(e.pixel, function (f) {
+//         if (f.get('id')) {
+//             selected = f;
+//             return true;
+//         }
+//     });
+// });
 ////***************************
 
 

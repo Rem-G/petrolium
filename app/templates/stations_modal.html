@@ -8,95 +8,142 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col my-auto">
-                    <div class="row justify-content-center text-center">
-                        <span>
-                            <i class="fas fa-map-marker-alt"></i>
-                            {{ station_infos.properties.adresse }} - {{station_infos.properties.ville }}
-                        </span>
-                    </div>
-                    <div class="row justify-content-center text-center">
-                        <span>
-                            <i class="fas fa-gas-pump"></i>
-                            Automate 24h/24
-                            {% if station_infos.properties|get_automate %}
-                                <i class="fas fa-check-circle"></i>
-                            {% else %}
-                                <i class="fas fa-times"></i>
-                            {% endif %}
-                        </span>
+                    <div class="row justify-content-center text-center col-12 mx-auto">
+                        <div class="col my-auto">
+                            <div class="justify-content-center text-center station-img">
+                                <img id="img-modal" class="img-responsive img-thumbnail img-fluid" style="max-width: 66px; max-height: 66px;" src=""></img>
+                            </div>
+                        </div>
+                        <div class="col my-auto">
+                            <div class="row justify-content-center text-center">
+                                <span class="justify-content-center text-center">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ station_infos.properties.adresse }} - {{station_infos.properties.ville }}
+                                </span>
+                            </div>
+                            <div class="row justify-content-center text-center">
+                                <span>
+                                    <i class="fas fa-gas-pump"></i>
+                                    Automate 24h/24
+                                    {% if station_infos.properties|get_automate %}
+                                        <i style="color:green;" class="fas fa-check-circle"></i>
+                                    {% else %}
+                                        <i style="color:rgb(220, 54, 69);" class="fas fa-times-circle"></i>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col my-auto">
+                            <table class="table ">
+                                {% for prix in station_infos.properties.prix %}
+                                    <tr>
+                                    {% for key, value in prix.items %}
+                                        {% if key == '@nom' %}
+                                            <td>
+                                                {{ value }}
+                                            </td>
+                                        {% elif key == '@valeur' %}
+                                            <td>
+                                                {{ value }}
+                                            </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                        <div class="col my-auto">
+                            <div class="card">
+                                <div class="card-body card-scroll">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <h4>
+                                                {% if len_services %}
+                                                    <span class="badge badge-primary badge-pill">Services disponibles : {{ len_services }}</span>
+                                                {% else %}
+                                                    <span class="badge badge-primary badge-pill">Services disponibles : 0</span>
+                                                {% endif %}
+                                            </h4>
+                                        </li>
+                                        {% for service in station_infos.properties.services %}
+                                            <li class="list-group-item">{{ service }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {% if station_infos.properties.services %}
-                    <div class="col">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                <h4>
-                                    <span class="badge badge-primary badge-pill">Services disponibles : {{ len_services }}</span>
-                                </h4>
-                            </li>
-                            {% for service in station_infos.properties.services %}
-                                <li class="list-group-item">{{ service }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>
-    <div class="row justify-content-center text-center">
-        <div class="table-responsive justify-content-center text-center">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col"></th>
-                        {% for jour in jours %}
-                            <th scope="col">{{ jour }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">Ouverture</th>
-                        {% for jour in jours %}
-                            {% if station_infos.properties.horaires|get_ferme:jour %}
-                                <td>
-                                    <div class="badge badge-danger text-center">Fermé</div>
-                                </td>
-                            {% elif station_infos.properties|get_automate and not station_infos.properties.horaires|get_infos_available:jour%}
-                                <td>
-                                    <div class="badge badge-success text-center">24h/24</div>
-                                </td>
-                            {% elif not station_infos.properties.horaires|get_infos_available:jour %}
-                                <td>
-                                    <div class="badge badge-warning text-center">Indisponible</div>
-                                </td>
-                            {% else %}
-                                <td>{{ station_infos.properties.horaires|get_ouverture:jour }}</td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <th scope="row">Fermeture</th>
-                        {% for jour in jours %}
-                            {% if station_infos.properties.horaires|get_ferme:jour %}
-                                <td>
-                                    <div class="badge badge-danger text-center">Fermé</div>
-                                </td>
-                            {% elif station_infos.properties|get_automate and not station_infos.properties.horaires|get_infos_available:jour%}
-                                <td>
-                                    <div class="badge badge-success text-center">24h/24</div>
-                                </td>
-                            {% elif not station_infos.properties.horaires|get_infos_available:jour %}
-                                <td>
-                                    <div class="badge badge-warning text-center">Indisponible</div>
-                                </td>
-                            {% else %}
-                                <td>{{ station_infos.properties.horaires|get_fermeture:jour }}</td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
+    <div class="row justify-content-center text-center py-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Horaires</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive justify-content-center text-center">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                {% for jour in jours %}
+                                    <th scope="col">{{ jour }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Ouverture</th>
+                                {% for jour in jours %}
+                                    {% if station_infos.properties.horaires|get_ferme:jour %}
+                                        <td>
+                                            <div class="badge badge-danger text-center">Fermé</div>
+                                        </td>
+                                    {% elif station_infos.properties|get_automate and not station_infos.properties.horaires|get_infos_available:jour%}
+                                        <td>
+                                            <div class="badge badge-success text-center">24h/24</div>
+                                        </td>
+                                    {% elif not station_infos.properties.horaires|get_infos_available:jour %}
+                                        <td>
+                                            <div class="badge badge-warning text-center">Indisponible</div>
+                                        </td>
+                                    {% else %}
+                                        <td>{{ station_infos.properties.horaires|get_ouverture:jour }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <th scope="row">Fermeture</th>
+                                {% for jour in jours %}
+                                    {% if station_infos.properties.horaires|get_ferme:jour %}
+                                        <td>
+                                            <div class="badge badge-danger text-center">Fermé</div>
+                                        </td>
+                                    {% elif station_infos.properties|get_automate and not station_infos.properties.horaires|get_infos_available:jour%}
+                                        <td>
+                                            <div class="badge badge-success text-center">24h/24</div>
+                                        </td>
+                                    {% elif not station_infos.properties.horaires|get_infos_available:jour %}
+                                        <td>
+                                            <div class="badge badge-warning text-center">Indisponible</div>
+                                        </td>
+                                    {% else %}
+                                        <td>{{ station_infos.properties.horaires|get_fermeture:jour }}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="font-style: italic;">Les horaires proposés sont à titre indicatif et peuvent comporter des erreurs.</p>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    var img_input = document.getElementById('img-modal-input').value;
+    $("#img-modal").attr("src", "{{ baseUrl }}img/"+img_input+".png");
+</script>
