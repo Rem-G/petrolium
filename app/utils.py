@@ -145,6 +145,11 @@ class Petrol():
 
 			os.remove(self.static_path + 'data.zip')
 
+		if (not os.path.isfile(self.static_path + 'osm_stations.json')
+			or os.path.getctime(self.static_path + 'osm_stations.json') + 2*24*3600 < now):
+    		
+			OSM().start_OSM_json_creation()
+
 	def add_stations_info(self, stations):
 		"""
 			Add name, isopened, OSM_coor of the station to data from its coordinates
