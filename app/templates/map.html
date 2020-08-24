@@ -103,75 +103,75 @@
 		<div id="map" class="map"></div>
 		<div id="popup" class="ol-popup">
 			<a href="#" id="popup-closer" class="ol-popup-closer"></a>
-			<div id="popup-content"></div>
+			<div id="popup-content">&times;</div>
 		</div>
 	</div>
 
 	<div class="modal fade" id="stationModal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-		  <div class="modal-content">
-			<div class="modal-header">
-			  <h5 class="modal-title" id="stationModalTitle"></h5>
-			  <input type="hidden" value="independant" id='img-modal-input'>
-			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			  </button>
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="stationModalTitle"></h5>
+					<input type="hidden" value="independant" id='img-modal-input'>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" id="station-modal-body">
+					{% include 'stations_modal.html' %}
+				</div>
 			</div>
-			<div class="modal-body">
-				{% include 'stations_modal.html' %}
-			</div>
-		  </div>
 		</div>
-	  </div>
+	</div>
 
-	  <div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal fade" id="infoModal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-		  <div class="modal-content">
-			<div class="modal-header">
-			  <h5 class="modal-title" id="stationModalTitle">A propos</h5>
-			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			  </button>
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="stationModalTitle">A propos</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>
+						Version : v1<br><br>
+						Ce projet à but non lucratif a pour but de simplifier la recherche d'une station service à proximité proposant les meilleurs prix.
+					</p>
+					<span>
+						Données sources : https://www.prix-carburants.gouv.fr/rubrique/opendata/, Nominatim OpenStreetMap
+					</span>
+					<br><br>
+					<span>
+						<i class="fab fa-github"></i>
+						Github : https://github.com/Rem-G/petrolium
+					</span>
+				</div>
 			</div>
-			<div class="modal-body">
-				<p>
-					Version : v1<br><br>
-					Ce projet à but non lucratif a pour but de simplifier la recherche d'une station service à proximité proposant les meilleurs prix.
-				</p>
-				<span>
-					Données sources : https://www.prix-carburants.gouv.fr/rubrique/opendata/, Nominatim OpenStreetMap
-				</span>
-				<br><br>
-				<span>
-					<i class="fab fa-github"></i>
-					Github : https://github.com/Rem-G/petrolium
-				</span>
-			</div>
-		  </div>
 		</div>
-	  </div>
+	</div>
 
-	  <div class="modal fade" id="tutoModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal fade" id="tutoModal" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-		  <div class="modal-content">
-			<div class="modal-header">
-			  <h5 class="modal-title" id="stationModalTitle">Utilisation</h5>
-			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			  </button>
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="stationModalTitle">Utilisation</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<p>
+						Petrolium vous permet de déterminer la station service proposant les meilleurs prix.
+						<br><br>
+						Naviguez sur la carte pour accéder à la zone de recherche de votre choix, ouvrez le tiroir situé au bas de votre écran et choisissez votre carburant; vous obtiendrez le classement des stations dans votre zone de recherche et pour votre carburant.
+						<br><br>
+						Vous pouvez obtenir davantage d'informations sur une station service en cliquant dessus sur la carte.
+					</p>
+				</div>
 			</div>
-			<div class="modal-body">
-				<p>
-					Petrolium vous permet de déterminer la station service proposant les meilleurs prix.
-					<br><br>
-					Naviguez sur la carte pour accéder à la zone de recherche de votre choix, ouvrez le tiroir situé au bas de votre écran et choisissez votre carburant; vous obtiendrez le classement des stations dans votre zone de recherche et pour votre carburant.
-					<br><br>
-					Vous pouvez obtenir davantage d'informations sur une station service en cliquant dessus sur la carte.
-				</p>
-			</div>
-		  </div>
 		</div>
-	  </div>
+	</div>
 
 	<script>
 		var static_url = "{% static  '' %}";

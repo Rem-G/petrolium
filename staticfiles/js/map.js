@@ -20,7 +20,7 @@ function update_modal(feature){
     }
     $("#img-modal-input").attr("value", feature.get('img'));
 
-    $('.modal-body').html('').load('/station/'+'?station_id='+feature.get('id'));
+    $('#station-modal-body').html('').load('/station/'+'?station_id='+feature.get('id'));
 }
 //**** */
 

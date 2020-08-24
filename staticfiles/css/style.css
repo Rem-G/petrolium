@@ -48,9 +48,9 @@ html, body, #map{
     top: 2px;
     right: 8px;
 }
-.ol-popup-closer:after {
+/* .ol-popup-closer:after {
     content: "✖";
-}
+} */
 
 .sidebar-head {
     width: 20em;
