@@ -1,3 +1,15 @@
+
+//ZOOM HEADER
+$('body').on('click mousemove mousedown mouseup touchstart touchend touchend', function(){
+    if (map.getView().getZoom() > 9){//Limit to request stations table
+        $('.header-zoom').hide(200);
+    }
+    else{
+        $('.header-zoom').show(200);
+    }
+})
+
+
 //MODAL
 function update_modal(feature){
     if(feature.get('img') == 'independant'){
@@ -66,7 +78,6 @@ var vectorSource = new ol.source.Vector({
     loader: function(extent, resolution, projection) {
         var proj = projection.getCode();
         var url = '/map/?in_bbox=' + extent.join(',');
-        console.log(url);
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url);
         var onError = function() {

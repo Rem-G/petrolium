@@ -144,11 +144,17 @@ class Petrol():
 			self.extract_zip(self.static_path, 'data.zip')
 
 			os.remove(self.static_path + 'data.zip')
+		
+			with open(self.static_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
+				self.stations_data = xmltodict.parse(fd.read())
 
 		if (not os.path.isfile(self.static_path + 'osm_stations.json')
 			or os.path.getctime(self.static_path + 'osm_stations.json') + 2*24*3600 < now):
     		
 			OSM().start_OSM_json_creation()
+
+			with open(self.static_path+'osm_stations.json', 'r') as f:
+				self.osm_data = json.loads(f.read())
 
 	def add_stations_info(self, stations):
 		"""

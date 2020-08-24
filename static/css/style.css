@@ -64,6 +64,17 @@ html, body, #map{
     position: fixed;
 }
 
+.header-zoom {
+    width: 25em;
+    /* height: 1.5em; */
+    top:0px;
+    left:50%;
+    margin-left:-12.5em;
+    border-radius: 0px 0px 5px 5px;
+    z-index: 100;
+    position: fixed;
+}
+
 .sidebar-head:hover {
     background-color: rgb(45, 46, 47);
 }
