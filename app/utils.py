@@ -149,6 +149,7 @@ class Petrol():
 			with open(self.media_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
 				self.stations_data = xmltodict.parse(fd.read())
 
+
 		if (not os.path.isfile(self.media_path + 'osm_stations.json')
 			or os.path.getctime(self.media_path + 'osm_stations.json') + 7*24*3600 < now):
     		
@@ -167,7 +168,7 @@ class Petrol():
 
 			if not station_info:
 				#There is an error in the json file
-				station_info = OSM().get_station_info_OSM(lat, lon, temp_station['properties']['adresse'])
+				station_info = OSM().get_station_info_OSM(lat, lon, temp_station['properties'].get('adresse'), temp_station['properties'].get('pop'))
 
 			temp_station['properties']['name'] = station_info.get('name')
 			temp_station['geometry']['coordinates'] = station_info.get('OSM_coor')
@@ -193,6 +194,7 @@ class Petrol():
 			Bbox filter
 			Return only the stations in the bbox
 		"""
+		self.create_petrol_data()
 		bbox_list = [float(b) for b in bbox.split(',')]
 
 		inProj = Proj('EPSG:3857')
