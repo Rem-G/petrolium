@@ -14,14 +14,15 @@ from django.conf import settings
 class Petrol():
 	def __init__(self):
 		self.data_download_url = "https://donnees.roulez-eco.fr/opendata/instantane"
-		self.static_path = settings.MEDIA_ROOT + '/data/'
+		self.media_path = settings.MEDIA_ROOT + '/data/'
+		self.static_path = settings.STATIC_ROOT + '/'
 		self.petrol_type = None
 		self.jours = {'0': 'lundi', '1': 'mardi', '2': 'mercredi', '3': 'jeudi', '4': 'vendredi', '5': 'samedi', '6': 'dimanche'}
 		self.create_petrol_data()
-		with open(self.static_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
+		with open(self.media_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
 			self.stations_data = xmltodict.parse(fd.read())
 
-		with open(self.static_path+'osm_stations.json', 'r') as f:
+		with open(self.media_path+'osm_stations.json', 'r') as f:
 			self.osm_data = json.loads(f.read())
 
 	def download_petrol_data(self, requests_url, static_url, filename, chunk_size=128):
@@ -137,23 +138,23 @@ class Petrol():
 		"""
 		now = time.time()
 
-		if (not os.path.isfile(self.static_path + 'PrixCarburants_instantane.xml')
-			or os.path.getctime(self.static_path + 'PrixCarburants_instantane.xml') + 20*60 < now):
+		if (not os.path.isfile(self.media_path + 'PrixCarburants_instantane.xml')
+			or os.path.getctime(self.media_path + 'PrixCarburants_instantane.xml') + 20*60 < now):
 
-			self.download_petrol_data(self.data_download_url, self.static_path, 'data.zip')
-			self.extract_zip(self.static_path, 'data.zip')
+			self.download_petrol_data(self.data_download_url, self.media_path, 'data.zip')
+			self.extract_zip(self.media_path, 'data.zip')
 
-			os.remove(self.static_path + 'data.zip')
+			os.remove(self.media_path + 'data.zip')
 		
-			with open(self.static_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
+			with open(self.media_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
 				self.stations_data = xmltodict.parse(fd.read())
 
-		if (not os.path.isfile(self.static_path + 'osm_stations.json')
-			or os.path.getctime(self.static_path + 'osm_stations.json') + 2*24*3600 < now):
+		if (not os.path.isfile(self.media_path + 'osm_stations.json')
+			or os.path.getctime(self.media_path + 'osm_stations.json') + 2*24*3600 < now):
     		
 			OSM().start_OSM_json_creation()
 
-			with open(self.static_path+'osm_stations.json', 'r') as f:
+			with open(self.media_path+'osm_stations.json', 'r') as f:
 				self.osm_data = json.loads(f.read())
 
 	def add_stations_info(self, stations):
@@ -175,9 +176,9 @@ class Petrol():
 			station_name_as_list = temp_station['properties']['name'].lower().replace('é', 'e').replace('è', 'e').split(" ")
 
 			for index, word in enumerate(station_name_as_list):
-				if index < len(station_name_as_list)-1 and word+station_name_as_list[index+1]+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+				if index < len(station_name_as_list)-1 and word+station_name_as_list[index+1]+'.png' in os.listdir(str(self.static_path) + 'img/'):
 					img = word+station_name_as_list[index+1]
-				elif word+'.png' in os.listdir(str(settings.BASE_DIR) + '/static/img/'):
+				elif word+'.png' in os.listdir(str(self.static_path) + 'img/'):
 					img = word
 
 			temp_station['properties'].update({'isopened': self.is_opened(temp_station)})#Add if the station is opened
@@ -310,7 +311,7 @@ class Petrol():
 
 
 	def force_update(self):
-		os.remove(self.static_path + 'PrixCarburants_instantane.xml')
+		os.remove(self.media_path + 'PrixCarburants_instantane.xml')
 		self.create_petrol_data()
 
 
@@ -347,7 +348,7 @@ class OSM(Petrol):
 			print( i, '/', len(geojson_data.get('features')))
 		
 		data['features'] = features
-		with open(self.static_path+'osm_stations.json', 'w+') as f:
+		with open(self.media_path+'osm_stations.json', 'w+') as f:
 			json.dump(data, f)
 
 

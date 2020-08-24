@@ -112,7 +112,7 @@ var vectorSource = new ol.source.Vector({
                         anchorYUnits: 'pixels',
                         scale: 0.5,
                         imgSize: [66, 66],
-                        src: '/static/img/' + feature.values_.img + '.png',
+                        src: static_url+'img/' + feature.values_.img + '.png',
                       })
                     });
                     // inside the loopi
@@ -255,7 +255,7 @@ map.on('click', function(evt){
 
         //Autoroute
         if (feature.get('pop') == 'A'){
-            content += '<div class="text-center"><img style="width:20px; height:20px;" src="/static/img/autoroute32.png"></img></div>';
+            content += '<div class="text-center"><img style="width:20px; height:20px;" src="'+static_url+'img/autoroute32.png"></img></div>';
         }
 
         content += '</div><div class="row pt-3 text-center justify-content-center">';
