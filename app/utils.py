@@ -150,7 +150,7 @@ class Petrol():
 				self.stations_data = xmltodict.parse(fd.read())
 
 		if (not os.path.isfile(self.media_path + 'osm_stations.json')
-			or os.path.getctime(self.media_path + 'osm_stations.json') + 2*24*3600 < now):
+			or os.path.getctime(self.media_path + 'osm_stations.json') + 7*24*3600 < now):
     		
 			OSM().start_OSM_json_creation()
 
@@ -350,6 +350,9 @@ class OSM(Petrol):
 		data['features'] = features
 		with open(self.media_path+'osm_stations.json', 'w+') as f:
 			json.dump(data, f)
+
+		self.thread.stop()
+		self.thread = threading.Thread(target=self.create_OSM_json, args=())
 
 
 	def get_station_info_OSM(self, lon, lat, adresse, pop):
