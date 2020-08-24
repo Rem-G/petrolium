@@ -314,6 +314,7 @@ var geocoder = new Geocoder('nominatim', {
     lang: 'fr-FR',
     placeholder: 'Rechercher ...',
     limit: 5,
+    countrycodes: 'FR',
     debug: false,
     autoComplete: true,
     keepOpen: true,

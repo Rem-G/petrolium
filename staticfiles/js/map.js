@@ -314,6 +314,7 @@ var geocoder = new Geocoder('nominatim', {
     lang: 'fr-FR',
     placeholder: 'Rechercher ...',
     limit: 5,
+    countrycodes: 'FR',
     debug: false,
     autoComplete: true,
     keepOpen: true,
@@ -377,7 +378,7 @@ document.getElementById('track').addEventListener('click', function () {
     }
     else{
         geolocation.setTracking(true);
-        setTimeout(go_to(geolocation.getPosition()), 1000);
+        setTimeout(go_to(geolocation.getPosition()), 3000);
         map.addLayer(GeoLayer);
     }
 });
