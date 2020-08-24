@@ -309,8 +309,12 @@ function go_to(coordinates) {
     map.setView(zoomView);
 }
 
+var provider = OsOpenNamesSearch({
+    url: '//nominatim.openstreetmap.org/search/',
+  });
+
 var geocoder = new Geocoder('nominatim', {
-    provider: 'osm',
+    provider: provider,
     lang: 'fr-FR',
     placeholder: 'Rechercher ...',
     limit: 5,
@@ -321,6 +325,66 @@ var geocoder = new Geocoder('nominatim', {
     preventDefault: true
     });
 map.addControl(geocoder);
+
+function OsOpenNamesSearch(options) {
+    //var url = options.url;
+    settings = {
+        url: 'https://nominatim.openstreetmap.org/search/',
+        params: {
+          q: '',
+          format: 'json',
+          addressdetails: 1,
+          limit: 10,
+          countrycodes: '',
+          'accept-language': 'en-US',
+        },
+      };
+
+    return {
+      /**
+       * Get the url, query string parameters and optional JSONP callback
+       * name to be used to perform a search.
+       * @param {object} options Options object with query, key, lang,
+       * countrycodes and limit properties.
+       * @return {object} Parameters for search request
+       */
+    
+        getParameters: function(opt) {
+        return {
+          url: settings.url,
+          params: {
+            q: opt.query,
+            format: settings.params.format,
+            addressdetails: settings.params.addressdetails,
+            limit: opt.limit || settings.params.limit,
+            countrycodes: opt.countrycodes || settings.params.countrycodes,
+            'accept-language': opt.lang || settings.params['accept-language'],
+          },
+        };
+      },
+    
+      handleResponse: function(results) {
+        if (!results.length) return;
+        return results.map(result => ({
+          lon: result.lon,
+          lat: result.lat,
+          address: {
+            name: _.at(result.display_name.split(','), [0, 2, 3]).join(', '),
+            //road: result.address.road || '',
+            //houseNumber: result.address.house_number || '',
+            postcode: result.address.postcode,
+            city: result.address.city || result.address.town,
+            state: result.address.state,
+            //country: result.address.country,
+          },
+          original: {
+            formatted: result.display_name,
+            details: result.address,
+          },
+        }));
+      }
+    }
+}
 
 geocoder.on('addresschosen', function(evt){
     var feature = evt.feature,
