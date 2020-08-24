@@ -168,6 +168,7 @@ class Petrol():
 
 			if not station_info:
 				#There is an error in the json file
+				print(temp_station['properties'].get('adresse'))
 				station_info = OSM().get_station_info_OSM(lat, lon, temp_station['properties'].get('adresse'), temp_station['properties'].get('pop'))
 
 			temp_station['properties']['name'] = station_info.get('name')
@@ -353,7 +354,6 @@ class OSM(Petrol):
 		with open(self.media_path+'osm_stations.json', 'w+') as f:
 			json.dump(data, f)
 
-		self.thread.stop()
 		self.thread = threading.Thread(target=self.create_OSM_json, args=())
 
 
