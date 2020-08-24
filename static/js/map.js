@@ -377,7 +377,7 @@ document.getElementById('track').addEventListener('click', function () {
     }
     else{
         geolocation.setTracking(true);
-        setTimeout(go_to(geolocation.getPosition()), 1000);
+        setTimeout(go_to(geolocation.getPosition()), 3000);
         map.addLayer(GeoLayer);
     }
 });
