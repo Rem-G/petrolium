@@ -18,12 +18,15 @@ class Petrol():
 		self.static_path = settings.STATIC_ROOT + '/'
 		self.petrol_type = None
 		self.jours = {'0': 'lundi', '1': 'mardi', '2': 'mercredi', '3': 'jeudi', '4': 'vendredi', '5': 'samedi', '6': 'dimanche'}
-		self.create_petrol_data()
+		#self.create_petrol_data()
 		with open(self.media_path + 'PrixCarburants_instantane' + '.xml', 'rb') as fd:
 			self.stations_data = xmltodict.parse(fd.read())
 
 		with open(self.media_path+'osm_stations.json', 'r') as f:
 			self.osm_data = json.loads(f.read())
+
+	def init_data(self):
+		self.create_petrol_data()
 
 	def download_petrol_data(self, requests_url, static_url, filename, chunk_size=128):
 		"""

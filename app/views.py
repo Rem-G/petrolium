@@ -6,6 +6,7 @@ p = Petrol()
 
 
 def home(request):
+    p.init_data()
     return render(request, 'map.html', locals())
 
 def map(request):
