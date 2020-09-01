@@ -140,8 +140,6 @@ class Petrol():
 			Download petrol data from donnees.roulez-eco.fr if the xml does not exists or is expired
 		"""
 		now = time.time()
-		for k in threading.enumerate():
-			print(k.getName())
 
 		if (not os.path.isfile(self.media_path + 'PrixCarburants_instantane.xml')
 			or os.path.getctime(self.media_path + 'PrixCarburants_instantane.xml') + 20*60 < now):
@@ -177,7 +175,7 @@ class Petrol():
 
 			if not station_info:
 				#There is an error in the json file
-				print(temp_station['properties'].get('adresse'))
+				print('OSM GET', temp_station['properties'].get('adresse'))
 				station_info = OSM().get_station_info_OSM(lat, lon, temp_station['properties'].get('adresse'), temp_station['properties'].get('pop'))
 
 			temp_station['properties']['name'] = station_info.get('name')
