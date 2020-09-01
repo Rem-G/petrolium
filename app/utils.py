@@ -140,6 +140,8 @@ class Petrol():
 			Download petrol data from donnees.roulez-eco.fr if the xml does not exists or is expired
 		"""
 		now = time.time()
+		for k in threading.enumerate():
+			print(k.getName())
 
 		if (not os.path.isfile(self.media_path + 'PrixCarburants_instantane.xml')
 			or os.path.getctime(self.media_path + 'PrixCarburants_instantane.xml') + 20*60 < now):
@@ -155,6 +157,10 @@ class Petrol():
 
 		if (not os.path.isfile(self.media_path + 'osm_stations.json')
 			or os.path.getctime(self.media_path + 'osm_stations.json') + 7*24*3600 < now):
+
+			for thread in threading.enumerate():
+				if thread.getName() == 'osm_json':
+					return
     		
 			OSM().start_OSM_json_creation()
 
@@ -327,6 +333,7 @@ class OSM(Petrol):
 		self.thread = threading.Thread(target=self.create_OSM_json, args=())
 
 	def start_OSM_json_creation(self):
+		self.thread.name = 'osm_json'
 		self.thread.daemon = True
 		self.thread.start()
 
